@@ -1,5 +1,5 @@
 <template>
-
+  <dasboard-page></dasboard-page>
 </template>
 
 <style>
@@ -13,3 +13,6 @@
 
 
 </style>
+<script setup>
+import DasboardPage from "@/pages/DasboardPage.vue";
+</script>
