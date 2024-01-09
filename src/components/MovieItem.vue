@@ -1,0 +1,69 @@
+<script setup>
+import useMoviePosterPath from "@/hooks/useMoviePosterPath"
+
+const props = defineProps({
+  movie: Object,
+  required: true,
+})
+
+const {getMoviePosterUrl} = useMoviePosterPath(props.movie.poster_path)
+
+
+</script>
+
+<template>
+  <div class="movie">
+      <div>
+        <img :src="getMoviePosterUrl()" :alt="movie.title">
+      </div>
+      <div class="movie__content">
+       <div>
+         <h3>{{movie.title}}</h3>
+         <p style="margin-top: 10px">
+           {{movie.original_title}},
+           {{movie.release_date}},
+           {{movie.original_language}}
+         </p>
+       </div>
+        <p>{{movie.overview}}</p>
+      </div>
+      <div class="movie__appraisal">
+        <p class="movie__vote-average">{{movie.vote_average.toFixed(1)}}</p>
+        <p style="color: rgba(0,0,0,.6);">{{movie.vote_count}}</p>
+      </div>
+  </div>
+</template>
+
+<style scoped>
+.movie {
+  padding: 15px;
+  width: 100%;
+  max-width: 850px;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  border-radius: 16px;
+}
+.movie:hover {
+  background-color: #f7f7f7;
+}
+.movie__content {
+  padding: 10px 0;
+  margin-left: 5px;
+  width: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.movie__vote-average {
+  margin-right: 5px;
+  color: #00008B;
+  font-size: 20px;
+  font-weight: 600;
+}
+.movie__appraisal {
+  margin-left: 5px;
+  display: flex;
+}
+</style>

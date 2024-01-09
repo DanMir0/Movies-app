@@ -1,31 +1,26 @@
 <template>
   <div>
     <h1>Список фильмов</h1>
-    <ul>
-      <li v-for="movie in moviesPopular" :key="movie.id">
-        <h3>{{movie.title}}</h3>
-        <div>
-          <p>{{movie.overview}}</p>
-        </div>
-
-      </li>
-    </ul>
+    <div class="container">
+      <movies-list
+          :movies="moviesPopular"
+      ></movies-list>
+    </div>
   </div>
 </template>
 
-<script>
+<script setup>
 import useMoviesPopular from "@/hooks/useMovies";
-export default {
- setup(props) {
-   const { moviesPopular } = useMoviesPopular()
-   console.log(moviesPopular)
-   return {
-     moviesPopular
-   }
- }
-}
+import MoviesList from "@/components/MoviesList.vue";
+
+const { moviesPopular } = useMoviesPopular()
+
 </script>
 
-<style lang="scss" scoped>
-
+<style scoped>
+.container {
+  margin: 0 auto;
+ max-width: 1600px;
+  width: 100%;
+}
 </style>
