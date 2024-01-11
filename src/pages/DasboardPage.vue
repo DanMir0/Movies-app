@@ -1,9 +1,15 @@
 <template>
   <div>
-    <h1>Список фильмов</h1>
+    <h1>List movies</h1>
+  <div>
+   <input
+       placeholder="Searh..."
+       v-model="searchQuery"
+   >
+  </div>
     <div class="container">
       <movies-list
-          :movies="moviesPopular"
+          :movies="searchedMovies"
       ></movies-list>
     </div>
   </div>
@@ -12,8 +18,12 @@
 <script setup>
 import useMoviesPopular from "@/hooks/useMovies";
 import MoviesList from "@/components/MoviesList.vue";
+import useSearchedMovies from "@/hooks/useSearchedMovies";
+
 
 const { moviesPopular } = useMoviesPopular()
+const { searchQuery, searchedMovies } = useSearchedMovies(moviesPopular)
+
 
 </script>
 

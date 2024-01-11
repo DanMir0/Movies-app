@@ -6,7 +6,7 @@ export default function useMoviesPopular() {
 
     const fetching = async () => {
         try {
-            const response = await axios.get('https://api.themoviedb.org/3/movie/popular', {
+            const response = await axios.get('https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc', {
                 params: {
                     api_key: '42b000d5a4c2a76ed3400dcd6cd491e0'
                 },

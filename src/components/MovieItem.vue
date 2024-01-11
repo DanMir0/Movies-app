@@ -1,13 +1,14 @@
 <script setup>
 import useMoviePosterPath from "@/hooks/useMoviePosterPath"
+import useGenresList from "@/hooks/useGenresList";
 
 const props = defineProps({
   movie: Object,
   required: true,
 })
 
-const {getMoviePosterUrl} = useMoviePosterPath(props.movie.poster_path)
-
+const { getMoviePosterUrl } = useMoviePosterPath(props.movie.poster_path)
+const { getGenresFromMovie } = useGenresList()
 
 </script>
 
@@ -24,6 +25,13 @@ const {getMoviePosterUrl} = useMoviePosterPath(props.movie.poster_path)
            {{movie.release_date}},
            {{movie.original_language}}
          </p>
+         <ul style="display: flex; list-style: none">
+            <li v-for="genre in getGenresFromMovie(movie.genre_ids)">
+              <input class="movie_genres" type="text" :value="genre" :readonly="true" >
+            </li>
+         </ul>
+
+
        </div>
         <p>{{movie.overview}}</p>
       </div>
@@ -65,5 +73,14 @@ const {getMoviePosterUrl} = useMoviePosterPath(props.movie.poster_path)
 .movie__appraisal {
   margin-left: 5px;
   display: flex;
+}
+.movie_genres {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #555;
+  border-radius: 3px;
+  width: 150px;
+  color: #333;
+  background-color: #f0f0f0;
 }
 </style>
