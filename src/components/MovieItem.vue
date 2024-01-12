@@ -25,7 +25,7 @@ const { getGenresFromMovie } = useGenresList()
            {{movie.release_date}},
            {{movie.original_language}}
          </p>
-         <ul style="display: flex; list-style: none">
+         <ul style="display: flex; flex-wrap: wrap; list-style: none">
             <li v-for="genre in getGenresFromMovie(movie.genre_ids)">
               <input class="movie_genres" type="text" :value="genre" :readonly="true" >
             </li>

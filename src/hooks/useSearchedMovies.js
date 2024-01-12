@@ -1,29 +1,73 @@
-import {computed, onMounted, ref} from "vue";
-import useGenresList from "@/hooks/useGenresList";
-
-export default function useSearchedMovies(movies) {
+import axios from "axios";
+import {ref, watch} from 'vue'
+export default function useSearchedMovies() {
     const searchQuery = ref('')
-    const { genresList, getGenresFromMovie } = useGenresList()
+    const searchResults = ref([])
 
-    onMounted(() => {
-        genresList.value
-    })
+    const searchMovies = async () => {
+        try {
+            searchResults.value = [];
+            const queryAsNumber = parseFloat(searchQuery.value)
 
-    const searchedMovies = computed(() => {
-        return movies.value.filter(movie => {
-            const titleMatch = movie.title
-                .toLowerCase()
-                .includes(searchQuery.value.toLowerCase());
-            const yearMatch =
-                movie.release_date.split("-")[0].includes(searchQuery.value);
-            const genresMatch = getGenresFromMovie(movie.genre_ids)
-                .some(genre => genre.toLowerCase().includes(searchQuery.value.toLowerCase()))
-            const ratingMatch = movie.vote_average.toString().includes(searchQuery.value)
-            return titleMatch || yearMatch || genresMatch || ratingMatch;
-        });
+            if (!isNaN(queryAsNumber) && queryAsNumber >= 0 && queryAsNumber <= 10) {
+                const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
+                    params: {
+                        api_key: '42b000d5a4c2a76ed3400dcd6cd491e0',
+                        'vote_average.gte': searchQuery.value,
+                        'vote_average.lte': 10,
+                        'sort_by': 'vote_average.asc'
+                    }
+                })
+                searchResults.value = response.data.results;
+            } else if (!isNaN(queryAsNumber) & queryAsNumber > 0) {
+                const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
+                    params: {
+                        api_key: '42b000d5a4c2a76ed3400dcd6cd491e0',
+                        'primary_release_year': searchQuery.value,
+                        'sort_by': 'popularity.desc'
+                    }
+                })
+                searchResults.value = response.data.results;
+            }
+            else {
+                const response = await axios.get('https://api.themoviedb.org/3/search/movie', {
+                        params: {
+                            api_key: '42b000d5a4c2a76ed3400dcd6cd491e0',
+                            query: searchQuery.value
+                        }
+                })
+                searchResults.value = response.data.results
+            }
+        } catch (e) {
+            console.log('Ошибка при поиске', e)
+        }
+    }
+    const searchByGenres = async (genreIds) => {
+        try {
+            searchResults.value = []
+            const genreNew = genreIds.value
+            if (genreNew.length > 0) {
+                const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
+                    params: {
+                        api_key: '42b000d5a4c2a76ed3400dcd6cd491e0',
+                        with_genres: genreNew.join(','),
+                        'sort_by': 'popularity.desc',
+                        'page': 1
+                    }
+                })
+                searchResults.value = response.data.results
+            }
+        } catch (e) {
+            console.log('search genres', e)
+        }
+    }
+    watch(searchQuery, () => {
+        searchMovies()
     });
-
     return {
-        searchQuery, searchedMovies
+        searchQuery,
+        searchResults,
+        searchMovies,
+        searchByGenres
     }
 }
