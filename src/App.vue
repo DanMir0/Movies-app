@@ -1,5 +1,5 @@
 <template>
-  <dasboard-page></dasboard-page>
+ <FilterPage></FilterPage>
 </template>
 
 <style>
@@ -20,5 +20,5 @@
 
 </style>
 <script setup>
-import DasboardPage from "@/pages/DasboardPage.vue";
+import FilterPage from "@/pages/FilterPage.vue";
 </script>

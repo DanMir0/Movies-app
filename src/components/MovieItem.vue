@@ -1,22 +1,15 @@
 <script setup>
-import useMoviePosterPath from "@/hooks/useMoviePosterPath"
-import useGenresList from "@/hooks/useGenresList";
 
 const props = defineProps({
   movie: Object,
   required: true,
 })
 
-const { getMoviePosterUrl } = useMoviePosterPath(props.movie.poster_path)
-const { getGenresFromMovie } = useGenresList()
 
 </script>
 
 <template>
   <div class="movie">
-      <div>
-        <img :src="getMoviePosterUrl()" :alt="movie.title">
-      </div>
       <div class="movie__content">
        <div>
          <h3>{{movie.title}}</h3>
@@ -25,13 +18,6 @@ const { getGenresFromMovie } = useGenresList()
            {{movie.release_date}},
            {{movie.original_language}}
          </p>
-         <ul style="display: flex; flex-wrap: wrap; list-style: none">
-            <li v-for="genre in getGenresFromMovie(movie.genre_ids)">
-              <input class="movie_genres" type="text" :value="genre" :readonly="true" >
-            </li>
-         </ul>
-
-
        </div>
         <p>{{movie.overview}}</p>
       </div>
