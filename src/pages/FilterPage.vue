@@ -1,41 +1,10 @@
-<template>
-  <div>
-    <h1>List movies</h1>
-    <div>
-      <select v-model="selectedYear" >
-        <option
-            v-for="year in filterYear"
-            :key="year.value"
-            :value="year.value"
-        >
-          {{year.name}}
-        </option>
-      </select>
-      <input type="range" min="0" max="10" step="0.1" v-model="rating">
-      <select multiple>
-        <option
-            v-for="genre in genres"
-            :key="genre.id"
-            :value="genre.id"
-            @click="handleGenreChange(genre.id)"
-        >
-          {{genre.name}}
-        </option>
-      </select>
-    </div>
-    <div>
-      <movies-list :movies="movies"></movies-list>
-    </div>
-  </div>
-</template>
-
 <script setup>
 import axios from "axios";
-import {onMounted, ref, watchEffect} from "vue";
+import { ref, watchEffect} from "vue";
 import MoviesList from "@/components/MoviesList.vue";
+import useMoviesGenres from "@/composition/useMoviesGenres";
 
 const movies = ref([])
-const genres = ref([])
 
 const filterYear = ref([
   {value: 2024, name: 2024},
@@ -69,6 +38,7 @@ const selectedGenres = ref([])
 
 const rating = ref()
 
+const { genres } = useMoviesGenres()
 const filterMovies = async () => {
   try {
     const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
@@ -87,18 +57,6 @@ const filterMovies = async () => {
 
 }
 
-const getAllGenres = async () => {
-  try {
-    const response = await axios.get('https://api.themoviedb.org/3/genre/movie/list', {
-      params: {
-        api_key: '42b000d5a4c2a76ed3400dcd6cd491e0',
-      }
-    })
-    genres.value = response.data.genres
-  } catch (e) {
-    console.log('get all genres', e)
-  }
-}
 function handleGenreChange(genreId) {
   if (selectedGenres.value.includes(genreId)) {
     selectedGenres.value = selectedGenres.value.filter((id) => id !== genreId);
@@ -106,15 +64,49 @@ function handleGenreChange(genreId) {
     selectedGenres.value.push(genreId);
   }
 };
-onMounted(() => {
-  getAllGenres();
-})
+
 watchEffect(() => {
   filterMovies()
 })
 
 
 </script>
+
+<template>
+  <div>
+    <div>
+      <select v-model="selectedYear" >
+        <option
+            v-for="year in filterYear"
+            :key="year.value"
+            :value="year.value"
+        >
+          {{year.name}}
+        </option>
+      </select>
+      <input
+          type="range"
+          min="0"
+          max="10"
+          step="0.1"
+          v-model="rating"
+      >
+      <select multiple>
+        <option
+            v-for="genre in genres"
+            :key="genre.id"
+            :value="genre.id"
+            @click="handleGenreChange(genre.id)"
+        >
+          {{genre.name}}
+        </option>
+      </select>
+    </div>
+    <div>
+      <movies-list :movies="movies"></movies-list>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 

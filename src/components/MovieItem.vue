@@ -1,15 +1,28 @@
 <script setup>
 
+import useMoviesGenres from "@/composition/useMoviesGenres";
+
 const props = defineProps({
   movie: Object,
   required: true,
 })
 
+function getMoviePosterUrl(posterPath) {
+  if(!posterPath) return
 
+  return `https://image.tmdb.org/t/p/w200${posterPath}`
+}
+
+const { getGenresFromMovie } = useMoviesGenres()
 </script>
 
 <template>
   <div class="movie">
+    <div class="move__title">
+      <img
+          :src="getMoviePosterUrl(movie.poster_path)"
+           :alt="movie.title">
+    </div>
       <div class="movie__content">
        <div>
          <h3>{{movie.title}}</h3>
@@ -19,10 +32,24 @@ const props = defineProps({
            {{movie.original_language}}
          </p>
        </div>
+        <div>
+            <ul style="display: flex; flex-wrap: wrap; list-style: none">
+              <li v-for="genre in getGenresFromMovie(movie.genre_ids)">
+                <input
+                    class="movie_genres"
+                    type="text"
+                    readonly
+                    :value="genre"
+                >
+              </li>
+            </ul>
+        </div>
         <p>{{movie.overview}}</p>
       </div>
       <div class="movie__appraisal">
-        <p class="movie__vote-average">{{movie.vote_average.toFixed(1)}}</p>
+        <p class="movie__vote-average">
+          {{movie.vote_average.toFixed(1)}}
+        </p>
         <p style="color: rgba(0,0,0,.6);">{{movie.vote_count}}</p>
       </div>
   </div>
@@ -68,5 +95,8 @@ const props = defineProps({
   width: 150px;
   color: #333;
   background-color: #f0f0f0;
+}
+.move__title {
+  display: flex;
 }
 </style>

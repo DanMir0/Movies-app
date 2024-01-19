@@ -1,5 +1,10 @@
+<script setup>
+
+import FilterPage from "@/pages/FilterPage.vue";
+</script>
+
 <template>
- <FilterPage></FilterPage>
+<filter-page></filter-page>
 </template>
 
 <style>
@@ -16,9 +21,4 @@
   text-align: center;
   color: #2c3e50;
 }
-
-
 </style>
-<script setup>
-import FilterPage from "@/pages/FilterPage.vue";
-</script>
