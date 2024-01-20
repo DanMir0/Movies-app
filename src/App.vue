@@ -1,10 +1,9 @@
 <script setup>
-
 import FilterPage from "@/pages/FilterPage.vue";
 </script>
 
 <template>
-<filter-page></filter-page>
+  <filter-page></filter-page>
 </template>
 
 <style>
