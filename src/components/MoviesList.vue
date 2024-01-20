@@ -10,8 +10,11 @@ const props = defineProps({
 </script>
 
 <template>
-  <div>
+  <div v-if="movies.length > 0">
     <movie-item :movie="movie" v-for="movie in movies" :key="movie.id"></movie-item>
+  </div>
+  <div v-else>
+    <h3 style="color: red;">Lists is empty</h3>
   </div>
 </template>
 

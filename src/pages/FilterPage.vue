@@ -34,6 +34,17 @@ const filterYear = ref([
   {value: 2000, name: 2000},
 ])
 const selectedYear = ref()
+
+const sortOptions = ref([
+  { value: 'popularity.asc', name: 'Popularity asc'},
+  { value: 'popularity.desc', name: 'Popularity desc'},
+  { value: 'primary_release_date.asc', name: 'Release date asc'},
+  { value: 'primary_release_date.desc', name: 'Release date desc'},
+  { value: 'vote_average.asc', name: 'Vote average asc'},
+  { value: 'vote_average.desc', name: 'Vote average desc'},
+])
+const selectedSort = ref()
+
 const selectedGenres = ref([])
 
 const rating = ref()
@@ -47,7 +58,8 @@ const filterMovies = async () => {
         'primary_release_year': selectedYear.value,
         'vote_average.gte': rating.value,
         'vote_average.lte': 10,
-        'with_genres': selectedGenres.value.join(',')
+        'with_genres': selectedGenres.value.join(','),
+        'sort_by': selectedSort.value
       }
     })
     movies.value = response.data.results
@@ -75,7 +87,8 @@ watchEffect(() => {
 <template>
   <div>
     <div>
-      <select v-model="selectedYear" >
+      <select v-model="selectedYear">
+        <option disabled value="">Year...</option>
         <option
             v-for="year in filterYear"
             :key="year.value"
@@ -96,9 +109,20 @@ watchEffect(() => {
             v-for="genre in genres"
             :key="genre.id"
             :value="genre.id"
+            :class="{ 'selected': selectedGenres.includes(genre.id) }"
             @click="handleGenreChange(genre.id)"
         >
           {{genre.name}}
+        </option>
+      </select>
+      <select v-model="selectedSort">
+        <option disabled value="">Select from the list</option>
+        <option
+            v-for="option in sortOptions"
+            :key="option.value"
+            :value="option.value"
+        >
+          {{ option.name }}
         </option>
       </select>
     </div>
@@ -109,5 +133,8 @@ watchEffect(() => {
 </template>
 
 <style scoped>
-
+.selected {
+  background-color: #0000FF;
+  color: #FFFFFF;
+}
 </style>
