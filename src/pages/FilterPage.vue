@@ -3,7 +3,6 @@ import axios from "axios";
 import { ref, watchEffect} from "vue";
 import MoviesList from "@/components/MoviesList.vue";
 import useMoviesGenres from "@/composition/useMoviesGenres";
-import MyNavbar from "@/components/MyNavbar.vue";
 
 const movies = ref([])
 

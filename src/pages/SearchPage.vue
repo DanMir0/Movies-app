@@ -1,12 +1,11 @@
 <script setup>
-import { ref, watchEffect} from "vue";
-import axios from "axios";
 import MoviesList from "@/components/MoviesList.vue";
-import MyNavbar from "@/components/MyNavbar.vue";
+import {ref, watchEffect} from "vue";
+import MyNavbar from "@/components/UI/MyNavbar.vue";
+import axios from "axios";
 
 const searchQuery = ref('')
 const searchedMovies = ref([])
-
 const fetchingSearch = async () => {
   try {
     const response = await axios.get('https://api.themoviedb.org/3/search/movie', {
@@ -15,7 +14,6 @@ const fetchingSearch = async () => {
         'query': searchQuery.value
       }
     })
-    console.log(response.data)
     searchedMovies.value = response.data.results
   } catch (e) {
     console.log('search', e)
@@ -24,12 +22,11 @@ const fetchingSearch = async () => {
 watchEffect(() => {
   fetchingSearch()
 })
+
 </script>
 
 <template>
-<!--  <my-navbar-->
-<!--     v-model:search-query="searchQuery"-->
-<!--  />-->
+  <my-navbar v-model:search-query="searchQuery"></my-navbar>
   <movies-list :movies="searchedMovies"></movies-list>
 </template>
 
