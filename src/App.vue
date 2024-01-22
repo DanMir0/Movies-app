@@ -1,11 +1,9 @@
 <script setup>
-import FilterPage from "@/pages/FilterPage.vue";
-import SearchPage from "@/pages/SearchPage.vue";
 
 </script>
 
 <template>
-<search-page></search-page>
+<router-view></router-view>
 </template>
 
 <style>

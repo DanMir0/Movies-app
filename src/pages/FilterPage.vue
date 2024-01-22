@@ -3,6 +3,8 @@ import axios from "axios";
 import { ref, watchEffect} from "vue";
 import MoviesList from "@/components/MoviesList.vue";
 import useMoviesGenres from "@/composition/useMoviesGenres";
+import MyNavbar from "@/components/UI/MyNavbar.vue";
+import {useRouter} from "vue-router";
 
 const movies = ref([])
 
@@ -66,7 +68,6 @@ const filterMovies = async () => {
   }catch (e) {
     console.log('filter movies', e)
   }
-
 }
 
 function handleGenreChange(genreId) {
@@ -75,15 +76,20 @@ function handleGenreChange(genreId) {
   } else {
     selectedGenres.value.push(genreId);
   }
-};
+}
 
 watchEffect(() => {
   filterMovies()
 })
 
+const router = useRouter()
+
 </script>
 
 <template>
+  <div>
+    <my-navbar></my-navbar>
+  </div>
   <div>
     <div>
       <select v-model="selectedYear">

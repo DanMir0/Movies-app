@@ -4,15 +4,18 @@ import FilterPage from "@/pages/FilterPage.vue";
 
 const routes = [
     {
-        path: '/search',
-        name: 'SearchPage',
-        component: SearchPage
-    },
-    {
         path: '/filter',
         name: 'FilterPage',
-        component: FilterPage
-    }
+        component: FilterPage,
+        alias: '/'
+    },
+    {
+        path: '/search/',
+        name: 'SearchPage',
+        component: SearchPage,
+        props: true
+    },
+
 ]
 
 const router = createRouter({
