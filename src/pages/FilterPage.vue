@@ -1,10 +1,9 @@
 <script setup>
 import axios from "axios";
-import { ref, watchEffect} from "vue";
+import {computed, ref, watchEffect} from "vue";
 import MoviesList from "@/components/MoviesList.vue";
 import useMoviesGenres from "@/composition/useMoviesGenres";
 import MyNavbar from "@/components/UI/MyNavbar.vue";
-import {useRouter} from "vue-router";
 
 const movies = ref([])
 
@@ -51,6 +50,9 @@ const selectedGenres = ref([])
 
 const rating = ref()
 
+const page = ref(1)
+const totalPages = ref(1)
+
 const { genres } = useMoviesGenres()
 const filterMovies = async () => {
   try {
@@ -61,10 +63,12 @@ const filterMovies = async () => {
         'vote_average.gte': rating.value,
         'vote_average.lte': 10,
         'with_genres': selectedGenres.value.join(','),
-        'sort_by': selectedSort.value
+        'sort_by': selectedSort.value,
+        'page': page.value
       }
     })
     movies.value = response.data.results
+    totalPages.value = response.data.total_pages
   }catch (e) {
     console.log('filter movies', e)
   }
@@ -78,11 +82,54 @@ function handleGenreChange(genreId) {
   }
 }
 
+function changePage(pageNumber) {
+  if (pageNumber !== '...') {
+    page.value = pageNumber
+  }
+}
+
 watchEffect(() => {
   filterMovies()
 })
 
-const router = useRouter()
+const displayedPages = computed(() => {
+  const result = [];
+  const totalDisplayPages = 5;
+
+  if (totalPages.value <= totalDisplayPages) {
+    for (let i = 1; i <= totalPages.value; i++) {
+      result.push(i);
+    }
+  } else {
+    const leftEllipsis = page.value > totalDisplayPages - 2;
+    const rightEllipsis = page.value < totalPages.value - (totalDisplayPages - 1);
+
+    if (!leftEllipsis) {
+      result.push(...Array(totalDisplayPages - 1).fill().map((_, i) => i + 1));
+      result.push('...');
+      result.push(totalPages.value);
+    } else if (!rightEllipsis) {
+      result.push(1, '...');
+      for (let i = totalPages.value - (totalDisplayPages - 1); i <= totalPages.value; i++) {
+        result.push(i);
+      }
+    } else {
+      result.push(1, '...');
+      for (let i = page.value - Math.floor(totalDisplayPages / 2); i <= page.value + Math.floor(totalDisplayPages / 2); i++) {
+        result.push(i);
+      }
+      result.push('...');
+      result.push(totalPages.value);
+    }
+  }
+  return result;
+});
+function prevPage() {
+  return page.value -= 1
+}
+function nextPage() {
+  return page.value += 1
+}
 
 </script>
 
@@ -134,6 +181,21 @@ const router = useRouter()
     <div>
       <movies-list :movies="movies"></movies-list>
     </div>
+   <div class="pagination">
+    <ul class="page__wrapper">
+      <li @click="prevPage"><span>Prev</span></li>
+      <li
+          v-for="pageNumber in displayedPages"
+          :key="pageNumber"
+          class="page"
+          :class="{'current-page': page === pageNumber}"
+          @click="changePage(pageNumber)"
+      >
+        {{pageNumber}}
+      </li>
+      <li @click="nextPage"><span>Next</span></li>
+    </ul>
+   </div>
   </div>
 </template>
 
@@ -142,4 +204,18 @@ const router = useRouter()
   background-color: #0000FF;
   color: #FFFFFF;
 }
+.page__wrapper {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.page {
+  border: 1px solid black;
+  padding: 10px;
+}
+.current-page {
+  border: 2px solid teal;
+}
+
 </style>
