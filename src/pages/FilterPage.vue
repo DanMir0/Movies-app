@@ -1,6 +1,6 @@
 <script setup>
 import axios from "axios";
-import {computed, ref, watchEffect} from "vue";
+import {computed, onMounted, ref, watch, watchEffect} from "vue";
 import MoviesList from "@/components/MoviesList.vue";
 import useMoviesGenres from "@/composition/useMoviesGenres";
 import MyNavbar from "@/components/UI/MyNavbar.vue";
@@ -88,40 +88,34 @@ function changePage(pageNumber) {
   }
 }
 
-watchEffect(() => {
-  filterMovies()
-})
-
 const displayedPages = computed(() => {
   const result = [];
-  const totalDisplayPages = 5;
+  const displayPage = 5;
+  const startPage = 1;
+  const endPage = totalPages.value
 
-  if (totalPages.value <= totalDisplayPages) {
-    for (let i = 1; i <= totalPages.value; i++) {
+  if (page.value < displayPage - 1) {
+    for (let i = startPage; i <= displayPage; i++) {
       result.push(i);
     }
-  } else {
-    const leftEllipsis = page.value > totalDisplayPages - 2;
-    const rightEllipsis = page.value < totalPages.value - (totalDisplayPages - 1);
-
-    if (!leftEllipsis) {
-      result.push(...Array(totalDisplayPages - 1).fill().map((_, i) => i + 1));
+    if (endPage > displayPage) {
       result.push('...');
-      result.push(totalPages.value);
-    } else if (!rightEllipsis) {
-      result.push(1, '...');
-      for (let i = totalPages.value - (totalDisplayPages - 1); i <= totalPages.value; i++) {
-        result.push(i);
-      }
-    } else {
-      result.push(1, '...');
-      for (let i = page.value - Math.floor(totalDisplayPages / 2); i <= page.value + Math.floor(totalDisplayPages / 2); i++) {
-        result.push(i);
-      }
+      result.push(endPage);
+    }
+  } else if (page.value > displayPage - 2) {
+    if (startPage < page.value - 2) {
+      result.push(startPage);
       result.push('...');
-      result.push(totalPages.value);
+    }
+    for (let i = Math.max(startPage, page.value - 2); i <= Math.min(page.value + 2, endPage); i++) {
+      result.push(i);
+    }
+    if (endPage > page.value + 2 && page.value !== endPage - 2) {
+      result.push('...');
+      result.push(endPage);
     }
   }
+
   return result;
 });
 function prevPage() {
@@ -130,6 +124,17 @@ function prevPage() {
 function nextPage() {
   return page.value += 1
 }
+
+onMounted(filterMovies)
+
+watch(page, () => {
+  filterMovies()
+})
+
+watch([selectedYear, rating, selectedGenres, selectedSort], () => {
+  page.value = 1
+  filterMovies()
+})
 
 </script>
 
@@ -156,13 +161,13 @@ function nextPage() {
           step="0.1"
           v-model="rating"
       >
-      <select multiple>
+      <select multiple v-model="selectedGenres">
         <option
             v-for="genre in genres"
             :key="genre.id"
             :value="genre.id"
             :class="{ 'selected': selectedGenres.includes(genre.id) }"
-            @click="handleGenreChange(genre.id)"
+            @change="handleGenreChange(genre.id)"
         >
           {{genre.name}}
         </option>

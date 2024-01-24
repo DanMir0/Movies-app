@@ -1,6 +1,6 @@
 <script setup>
 import MoviesList from "@/components/MoviesList.vue";
-import {computed, ref, watchEffect} from "vue";
+import {computed, ref, watch} from "vue";
 import MyNavbar from "@/components/UI/MyNavbar.vue";
 import axios from "axios";
 import {useRoute} from "vue-router";
@@ -72,8 +72,12 @@ function nextPage() {
   return page.value += 1
 }
 
+watch(searchQuery, () => {
+  page.value = 1
+  fetchingSearch()
+})
 
-watchEffect(() => {
+watch(page, () => {
   fetchingSearch()
 })
 </script>

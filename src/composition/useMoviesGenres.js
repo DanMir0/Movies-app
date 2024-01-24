@@ -17,9 +17,6 @@ export default function useMoviesGenres() {
     }
 
     const getGenresFromMovie = (genreIds) => {
-        if (typeof genreIds !== 'array') {
-            return []
-        }
         return genres.value
             .filter(genre => genreIds.includes(genre.id))
             .map(genre => genre.name)
