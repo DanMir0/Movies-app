@@ -48,7 +48,7 @@ const { getGenresFromMovie } = useMoviesGenres()
       </div>
       <div class="movie__appraisal">
         <p class="movie__vote-average">
-          {{movie.vote_average.toFixed(1)}}
+          {{ movie.vote_average !== 'undefined' ? movie.vote_average : 0 }}
         </p>
         <p style="color: rgba(0,0,0,.6);">{{movie.vote_count}}</p>
       </div>
