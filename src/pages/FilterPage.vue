@@ -181,7 +181,7 @@ function nextPage() {
     <div>
       <movies-list :movies="movies"></movies-list>
     </div>
-   <div class="pagination">
+   <div class="pagination" v-if="movies.length > 0">
     <ul class="page__wrapper">
       <li @click="prevPage"><span>Prev</span></li>
       <li
