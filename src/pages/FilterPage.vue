@@ -1,6 +1,6 @@
 <script setup>
 import axios from "axios";
-import {computed, onMounted, ref, watch, watchEffect} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import MoviesList from "@/components/MoviesList.vue";
 import useMoviesGenres from "@/composition/useMoviesGenres";
 import MyNavbar from "@/components/UI/MyNavbar.vue";
@@ -34,7 +34,7 @@ const filterYear = ref([
   {value: 2001, name: 2001},
   {value: 2000, name: 2000},
 ])
-const selectedYear = ref()
+const selectedYear = ref('')
 
 const sortOptions = ref([
   { value: 'popularity.asc', name: 'Popularity asc'},
@@ -44,7 +44,7 @@ const sortOptions = ref([
   { value: 'vote_average.asc', name: 'Vote average asc'},
   { value: 'vote_average.desc', name: 'Vote average desc'},
 ])
-const selectedSort = ref()
+const selectedSort = ref('popularity.desc')
 
 const selectedGenres = ref([])
 
@@ -74,12 +74,14 @@ const filterMovies = async () => {
   }
 }
 
-function handleGenreChange(genreId) {
+const handleGenreChange = (genreId) => {
   if (selectedGenres.value.includes(genreId)) {
-    selectedGenres.value = selectedGenres.value.filter((id) => id !== genreId);
+    selectedGenres.value = selectedGenres.value.filter(id => id !== genreId)
   } else {
-    selectedGenres.value.push(genreId);
+    selectedGenres.value.push(genreId)
   }
+  page.value = 1
+  filterMovies()
 }
 
 function changePage(pageNumber) {
@@ -131,7 +133,7 @@ watch(page, () => {
   filterMovies()
 })
 
-watch([selectedYear, rating, selectedGenres, selectedSort], () => {
+watch([selectedYear, rating, selectedSort], () => {
   page.value = 1
   filterMovies()
 })
@@ -161,13 +163,14 @@ watch([selectedYear, rating, selectedGenres, selectedSort], () => {
           step="0.1"
           v-model="rating"
       >
-      <select multiple v-model="selectedGenres">
+      <select multiple>
+        <option disabled value="">Genres...</option>
         <option
             v-for="genre in genres"
             :key="genre.id"
             :value="genre.id"
             :class="{ 'selected': selectedGenres.includes(genre.id) }"
-            @change="handleGenreChange(genre.id)"
+            @click="handleGenreChange(genre.id)"
         >
           {{genre.name}}
         </option>
