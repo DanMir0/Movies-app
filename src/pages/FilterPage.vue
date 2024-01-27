@@ -1,39 +1,11 @@
 <script setup>
 import axios from "axios";
-import {computed, onMounted, ref, watch} from "vue";
+import {onMounted, ref, watch} from "vue";
 import MoviesList from "@/components/MoviesList.vue";
 import useMoviesGenres from "@/composition/useMoviesGenres";
-import MyNavbar from "@/components/UI/MyNavbar.vue";
 
 const movies = ref([])
 
-const filterYear = ref([
-  {value: 2024, name: 2024},
-  {value: 2023, name: 2023},
-  {value: 2022, name: 2022},
-  {value: 2021, name: 2021},
-  {value: 2020, name: 2020},
-  {value: 2019, name: 2019},
-  {value: 2018, name: 2018},
-  {value: 2017, name: 2017},
-  {value: 2016, name: 2016},
-  {value: 2015, name: 2015},
-  {value: 2014, name: 2014},
-  {value: 2013, name: 2013},
-  {value: 2012, name: 2012},
-  {value: 2011, name: 2011},
-  {value: 2010, name: 2010},
-  {value: 2009, name: 2009},
-  {value: 2008, name: 2008},
-  {value: 2007, name: 2007},
-  {value: 2006, name: 2006},
-  {value: 2005, name: 2005},
-  {value: 2004, name: 2004},
-  {value: 2003, name: 2003},
-  {value: 2002, name: 2002},
-  {value: 2001, name: 2001},
-  {value: 2000, name: 2000},
-])
 const selectedYear = ref('')
 
 const sortOptions = ref([
@@ -90,43 +62,6 @@ function changePage(pageNumber) {
   }
 }
 
-const displayedPages = computed(() => {
-  const result = [];
-  const displayPage = 5;
-  const startPage = 1;
-  const endPage = totalPages.value
-
-  if (page.value < displayPage - 1) {
-    for (let i = startPage; i <= displayPage; i++) {
-      result.push(i);
-    }
-    if (endPage > displayPage) {
-      result.push('...');
-      result.push(endPage);
-    }
-  } else if (page.value > displayPage - 2) {
-    if (startPage < page.value - 2) {
-      result.push(startPage);
-      result.push('...');
-    }
-    for (let i = Math.max(startPage, page.value - 2); i <= Math.min(page.value + 2, endPage); i++) {
-      result.push(i);
-    }
-    if (endPage > page.value + 2 && page.value !== endPage - 2) {
-      result.push('...');
-      result.push(endPage);
-    }
-  }
-
-  return result;
-});
-function prevPage() {
-  return page.value -= 1
-}
-function nextPage() {
-  return page.value += 1
-}
-
 onMounted(filterMovies)
 
 watch(page, () => {
@@ -142,18 +77,15 @@ watch([selectedYear, rating, selectedSort], () => {
 
 <template>
   <div>
-    <my-navbar></my-navbar>
-  </div>
-  <div>
     <div>
       <select v-model="selectedYear">
         <option disabled value="">Year...</option>
         <option
-            v-for="year in filterYear"
-            :key="year.value"
-            :value="year.value"
+            v-for="year in 24"
+            :key="year"
+            :value="2000 + year"
         >
-          {{year.name}}
+          {{2000 + year}}
         </option>
       </select>
       <input
@@ -189,21 +121,7 @@ watch([selectedYear, rating, selectedSort], () => {
     <div>
       <movies-list :movies="movies"></movies-list>
     </div>
-   <div class="pagination" v-if="movies.length > 0">
-    <ul class="page__wrapper">
-      <li @click="prevPage"><span>Prev</span></li>
-      <li
-          v-for="pageNumber in displayedPages"
-          :key="pageNumber"
-          class="page"
-          :class="{'current-page': page === pageNumber}"
-          @click="changePage(pageNumber)"
-      >
-        {{pageNumber}}
-      </li>
-      <li @click="nextPage"><span>Next</span></li>
-    </ul>
-   </div>
+   <ma-pagination :page="page" :total-pages="totalPages" @change="changePage"></ma-pagination>
   </div>
 </template>
 
@@ -211,19 +129,6 @@ watch([selectedYear, rating, selectedSort], () => {
 .selected {
   background-color: #0000FF;
   color: #FFFFFF;
-}
-.page__wrapper {
-  list-style: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.page {
-  border: 1px solid black;
-  padding: 10px;
-}
-.current-page {
-  border: 2px solid teal;
 }
 
 </style>

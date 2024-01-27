@@ -5,10 +5,6 @@ import {ref} from "vue";
 const searchQuery = ref('')
 const router = useRouter()
 
-defineProps({
-  searchQuery: String,
-})
-defineEmits(['update:searchQuery'])
 </script>
 
 <template>
