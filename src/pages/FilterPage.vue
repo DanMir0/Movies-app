@@ -2,7 +2,7 @@
 import axios from "axios";
 import {onMounted, ref, watch} from "vue";
 import MoviesList from "@/components/MoviesList.vue";
-import useMoviesGenres from "@/composition/useMoviesGenres";
+import useMoviesGenres from "@/composable/useMoviesGenres";
 
 const movies = ref([])
 
@@ -27,23 +27,19 @@ const totalPages = ref(1)
 
 const { genres } = useMoviesGenres()
 const filterMovies = async () => {
-  try {
-    const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
-      params: {
-        api_key: '42b000d5a4c2a76ed3400dcd6cd491e0',
-        'primary_release_year': selectedYear.value,
-        'vote_average.gte': rating.value,
-        'vote_average.lte': 10,
-        'with_genres': selectedGenres.value.join(','),
-        'sort_by': selectedSort.value,
-        'page': page.value
-      }
-    })
-    movies.value = response.data.results
-    totalPages.value = response.data.total_pages
-  }catch (e) {
-    console.log('filter movies', e)
-  }
+  const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
+    params: {
+      api_key: '42b000d5a4c2a76ed3400dcd6cd491e0',
+      'primary_release_year': selectedYear.value,
+      'vote_average.gte': rating.value,
+      'vote_average.lte': 10,
+      'with_genres': selectedGenres.value.join(','),
+      'sort_by': selectedSort.value,
+      'page': page.value
+    }
+  })
+  movies.value = response.data.results
+  totalPages.value = response.data.total_pages
 }
 
 const handleGenreChange = (genreId) => {

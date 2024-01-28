@@ -43,17 +43,21 @@ const displayedPages = computed(() => {
 <template>
   <div  class="pagination">
     <ul class="page__wrapper">
-      <li v-if="props.page !== 1" @click="$emit('change', props.page - 1)"><span>Prev</span></li>
+      <li v-if="props.page !== 1" ><a href="#" @click="$emit('change', props.page - 1)">Prev</a></li>
       <li
           v-for="pageNumber in displayedPages"
           :key="pageNumber"
           class="page"
           :class="{'current-page': props.page === pageNumber}"
-          @click="$emit('change', pageNumber)"
       >
-        {{pageNumber}}
+        <a
+            href="#"
+            @click="$emit('change', pageNumber)"
+        >
+          {{ pageNumber }}
+        </a>
       </li>
-      <li v-if="props.page !== totalPages" @click="$emit('change', props.page + 1)"><span>Next</span></li>
+      <li v-if="props.page !== totalPages"><a href="#" @click="$emit('change', props.page + 1)">Next</a></li>
     </ul>
   </div>
 </template>

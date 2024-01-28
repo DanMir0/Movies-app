@@ -1,6 +1,7 @@
 <script setup>
 
-import useMoviesGenres from "@/composition/useMoviesGenres";
+import useMoviesGenres from "@/composable/useMoviesGenres";
+import MoviesList from "@/components/MoviesList.vue";
 
 const props = defineProps({
   movie: Object,
@@ -26,14 +27,14 @@ const { getGenresFromMovie } = useMoviesGenres()
       <div class="movie__content">
        <div>
          <h3>{{movie.title}}</h3>
-         <p style="margin-top: 10px">
+         <p class="movie__description">
            {{movie.original_title}},
            {{movie.release_date}},
            {{movie.original_language}}
          </p>
        </div>
         <div>
-            <ul style="display: flex; flex-wrap: wrap; list-style: none">
+            <ul class="movie__lists">
               <li v-for="genre in getGenresFromMovie(movie.genre_ids)">
                 <input
                     class="movie_genres"
@@ -50,7 +51,7 @@ const { getGenresFromMovie } = useMoviesGenres()
         <p class="movie__vote-average">
           {{ movie.vote_average !== 'undefined' ? movie.vote_average : 0 }}
         </p>
-        <p style="color: rgba(0,0,0,.6);">{{movie.vote_count}}</p>
+        <p class="movie__vote-count">{{movie.vote_count}}</p>
       </div>
   </div>
 </template>
@@ -98,5 +99,17 @@ const { getGenresFromMovie } = useMoviesGenres()
 }
 .move__title {
   display: flex;
+}
+.movie__lists {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none"
+}
+.movie__description {
+  margin-top: 10px;
+}
+
+.movie__vote-count {
+  color: rgba(0,0,0,.6);
 }
 </style>
