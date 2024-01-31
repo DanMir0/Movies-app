@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import SearchPage from "@/pages/SearchPage.vue";
 import FilterPage from "@/pages/FilterPage.vue";
+import DetailsMoviePage from "@/pages/DetailsMoviePage.vue";
 
 const routes = [
     {
@@ -15,6 +16,11 @@ const routes = [
         component: SearchPage,
         props: true
     },
+    {
+        path: '/movie/{:movie_id}',
+        name: 'movie-details',
+        component: DetailsMoviePage
+    }
 
 ]
 

@@ -1,7 +1,5 @@
 <script setup>
-
 import useMoviesGenres from "@/composable/useMoviesGenres";
-import MoviesList from "@/components/MoviesList.vue";
 
 const props = defineProps({
   movie: Object,
@@ -18,6 +16,7 @@ const { getGenresFromMovie } = useMoviesGenres()
 </script>
 
 <template>
+  <router-link :to="{name: 'movie-details', params: {movie_id: movie.id}}">
   <div class="movie">
     <div class="move__title">
       <img
@@ -54,6 +53,7 @@ const { getGenresFromMovie } = useMoviesGenres()
         <p class="movie__vote-count">{{movie.vote_count}}</p>
       </div>
   </div>
+  </router-link>
 </template>
 
 <style scoped>
@@ -103,7 +103,7 @@ const { getGenresFromMovie } = useMoviesGenres()
 .movie__lists {
   display: flex;
   flex-wrap: wrap;
-  list-style: none"
+  list-style: none;
 }
 .movie__description {
   margin-top: 10px;

@@ -11,7 +11,7 @@ const props = defineProps({
 
 <template>
   <div v-if="movies.length > 0">
-    <movie-item :movie="movie" v-for="movie in movies" :key="movie.id"></movie-item>
+      <movie-item :movie="movie" v-for="movie in movies" :key="movie.id"></movie-item>
   </div>
   <div v-else>
     <h3 style="color: red;">Lists is empty</h3>
