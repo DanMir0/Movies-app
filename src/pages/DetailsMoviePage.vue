@@ -15,10 +15,6 @@ const fetching = async () => {
     })
     movie.value = response.data
 }
-const linkToMovie = async () => {
-    const response = await axios.get(`https://www.imdb.com/title/${movie.value.imdb_id}/`);
-    movieLink.value = { imdbLink: response.config.url };
-}
 function getMoviePosterUrl(posterPath) {
     if (!posterPath) return
 
@@ -49,20 +45,22 @@ onMounted(() => {
                 <h2>{{ movie.title }}</h2>
                 <div class="movie__items">
                     <div class="movie__items-name">
-                        <p class="mb-10">Name:</p>
-                        <p class="mb-10">Country:</p>
-                        <p class="mb-10">Genre:</p>
-                        <p class="mb-10">Budget:</p>
-                        <p class="mb-10">Revenue:</p>
-                        <p class="mb-10">Official website:</p>
+                        <p>Name:</p>
+                        <p>Country:</p>
+                        <p>Genre:</p>
+                        <p>Budget:</p>
+                        <p>Revenue:</p>
+                        <p>Official website:</p>
+                        <p>IMDB:</p>
                     </div>
                     <div class="movie__items-value">
-                        <p class="mb-10">{{ movie.original_title }}</p>
-                        <div class="group__item"><p class="mb-10" v-for="(country, index) in movie.production_countries"> {{ country.name + (index < movie.production_countries.length - 1 ? ',&nbsp;' : ' ')}}</p></div>
-                        <div class="group__item"><p class="mb-10" v-for="(genre, index) in movie.genres"> {{ genre.name + (index < movie.genres.length - 1 ? ',&nbsp;' : ' ') }}</p></div>
-                        <p class="mb-10">${{ movie.budget ? movie.budget.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '' }}</p>
-                        <p class="mb-10">${{ movie.revenue ? movie.revenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '' }}</p>
-                        <a class="mb-10" :href="movie.homepage">{{movie.homepage}}</a>
+                        <p>{{ movie.original_title }}</p>
+                        <div class="group__item"><p v-for="(country, index) in movie.production_countries"> {{ country.name + (index < movie.production_countries.length - 1 ? ',&nbsp;' : ' ')}}</p></div>
+                        <div class="group__item"><p v-for="(genre, index) in movie.genres"> {{ genre.name + (index < movie.genres.length - 1 ? ',&nbsp;' : ' ') }}</p></div>
+                        <p>${{ movie.budget ? movie.budget.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '' }}</p>
+                        <p>${{ movie.revenue ? movie.revenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '' }}</p>
+                        <a :href="movie.homepage">{{movie.homepage}}</a>
+                        <a :href="`https://www.imdb.com/title/${movie.imdb_id}`">https://www.imdb.com/title/{{movie.imdb_id}}</a>
                     </div>
                 </div>
                 <p>{{movie.overview}}</p>
@@ -88,19 +86,25 @@ onMounted(() => {
 }
 
 .movie__items {
-    margin-top: 15px;
+    margin: 20px 0;
     display: flex;
     flex-direction: row;
 }
 
 .group__item {
     display: flex;
+    flex-direction: row;
 }
 
 .movie__items-value {
     margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
-.mb-10 {
-    margin-bottom: 10px;
+.movie__items-name {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 </style>
