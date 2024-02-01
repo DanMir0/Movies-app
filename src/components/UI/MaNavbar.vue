@@ -1,6 +1,7 @@
 <script setup>
 import {useRouter} from "vue-router";
 import {ref} from "vue";
+import { AkSearch } from "@kalimahapps/vue-icons";
 
 const searchQuery = ref('')
 const router = useRouter()
@@ -11,7 +12,7 @@ const router = useRouter()
   <div class="navbar">
     <div class="logo">
       <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-           width="150.000000pt" height="125.000000pt" viewBox="0 0 1280.000000 901.000000"
+           width="140.000000pt" height="90.000000pt" viewBox="0 0 1280.000000 901.000000"
            preserveAspectRatio="xMidYMid meet">
         <metadata>
           Created by potrace 1.15, written by Peter Selinger 2001-2017
@@ -181,34 +182,47 @@ m-359 -105 c8 -30 11 -57 7 -60 -12 -11 -213 -61 -226 -56 -10 4 -41 107 -34
         <h2>Watch for Free</h2>
       </div>
     </div>
-    <div>
+    <div class="menu">
       <router-link to="/filter">Movies</router-link>
     </div>
-    <input
-        v-model="searchQuery"
-        @keyup.enter="$emit('update:searchQuery', $event.target.value)"
-        @keydown.enter="router.push({ name: 'SearchPage', query: {q: searchQuery}})"
-        placeholder="Search...">
+      <div class="block__search">
+          <ma-input
+              class="search"
+              v-model="searchQuery"
+              @keyup.enter="$emit('update:searchQuery', $event.target.value)"
+              @keydown.enter="router.push({ name: 'SearchPage', query: {q: searchQuery}})"
+              placeholder="Search..."
+          />
+          <span class="search-icon">
+        <AkSearch style="color: #FFFFFF;"></AkSearch>
+    </span>
+      </div>
   </div>
 </template>
 
 <style scoped>
 .navbar {
+    padding: 20px;
   background-color: #0f0f0f;
   display: flex;
   flex-direction: row;
+    justify-content: space-between;
   align-items: center;
 }
 
 .logo {
   display: flex;
   align-items: center;
+    gap: 50px;
 }
 
 h1 {
-  font-size: 77px;
+  font-size: 60px;
 }
-
+h2 {
+   font-size: 25px;
+    text-align: center;
+}
 h1,
 h2 {
   color: #b8860b;
@@ -225,5 +239,29 @@ hr {
   font-family: "Allison", cursive;
   font-weight: 400;
   font-style: normal;
+}
+.menu a {
+    font-size: 25px;
+    color: #FFFFFF;
+    text-decoration: none;
+}
+.menu a:hover {
+    color: #b8860b;
+}
+.block__search {
+    max-width: 360px;
+    width: 100%;
+    position: relative;
+}
+.search {
+    width: 100%;
+    padding-right: 30px;
+}
+.search-icon {
+    position: absolute;
+    top: 50%;
+    right: 10px; /* Установите отступ справа для положения иконки */
+    transform: translateY(-50%);
+    pointer-events: none; /* Иконка не взаимодействует с событиями мыши */
 }
 </style>
