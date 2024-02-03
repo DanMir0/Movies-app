@@ -27,7 +27,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="container">
+    <div>
         <div class=movie>
             <div>
                 <img :src="getMoviePosterUrl(movie.poster_path)" :alt="movie.title">
@@ -70,11 +70,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.container {
-    margin: 0 auto;
-    width: 100%;
-    max-width: 1200px;
-}
+
 
 .movie {
     margin-top: 20px;

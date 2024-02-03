@@ -21,6 +21,7 @@ const selectedSort = ref('popularity.desc')
 const selectedGenres = ref([])
 
 const rating = ref()
+const rangeLabels = Array.from({ length: 10 }, (_, i) => i);
 
 const page = ref(1)
 const totalPages = ref(1)
@@ -42,12 +43,12 @@ const filterMovies = async () => {
   totalPages.value = response.data.total_pages
 }
 
-const handleGenreChange = (genreId) => {
-  if (selectedGenres.value.includes(genreId)) {
-    selectedGenres.value = selectedGenres.value.filter(id => id !== genreId)
-  } else {
-    selectedGenres.value.push(genreId)
-  }
+const genreChange = (idGenre) => {
+    if (selectedGenres.value.includes(idGenre)) {
+        selectedGenres.value = selectedGenres.value.filter(id => id !== idGenre)
+    } else {
+        selectedGenres.value.push(idGenre)
+    }
   page.value = 1
   filterMovies()
 }
@@ -72,11 +73,12 @@ watch([selectedYear, rating, selectedSort], () => {
 </script>
 
 <template>
-  <div>
-    <div>
-      <select v-model="selectedYear">
-        <option disabled value="">Year...</option>
+  <div class="filter-page">
+    <div class="menu">
+      <select class="select__solo" v-model="selectedYear">
+        <option class="option__solo" disabled value="">Year...</option>
         <option
+            class="option__solo"
             v-for="year in 24"
             :key="year"
             :value="2000 + year"
@@ -84,28 +86,23 @@ watch([selectedYear, rating, selectedSort], () => {
           {{2000 + year}}
         </option>
       </select>
-      <input
-          type="range"
-          min="0"
-          max="10"
-          step="0.1"
-          v-model="rating"
-      >
-      <select multiple>
-        <option disabled value="">Genres...</option>
+        <div class="range-container">
+            <input
+                type="range"
+                min="0"
+                max="10"
+                step="0.1"
+                v-model="rating"
+            >
+            <div class="range-labels">
+                <span v-for="label in rangeLabels" :key="label">{{ label + 1 }}</span>
+            </div>
+        </div>
+        <ma-multi-select :genres="genres" @genreChange="genreChange"></ma-multi-select>
+      <select class="select__solo" v-model="selectedSort">
+        <option class="option__solo" value="">Select from the list</option>
         <option
-            v-for="genre in genres"
-            :key="genre.id"
-            :value="genre.id"
-            :class="{ 'selected': selectedGenres.includes(genre.id) }"
-            @click="handleGenreChange(genre.id)"
-        >
-          {{genre.name}}
-        </option>
-      </select>
-      <select v-model="selectedSort">
-        <option disabled value="">Select from the list</option>
-        <option
+            class="option__solo"
             v-for="option in sortOptions"
             :key="option.value"
             :value="option.value"
@@ -122,9 +119,83 @@ watch([selectedYear, rating, selectedSort], () => {
 </template>
 
 <style scoped>
-.selected {
-  background-color: #0000FF;
-  color: #FFFFFF;
+.menu {
+    display: flex;
+    max-width: 900px;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+.filter-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
+.select__solo {
+    border-radius: 10px;
+    background-color: transparent;
+    color: #FFFFFF;
+    display:flex;
+    width:250px;
+    height:40px;
+    padding: 10px; /* Регулируйте отступы по вашему желанию */
+    font-size: 15px
+}
+.option__solo {
+    padding: 10px;
+    min-height:40px;
+    display:flex;
+    align-items:center;
+    background:#333;
+    border-top:#222 solid 1px;
+    font-size: 15px;
+}
+
+.range-container {
+    position: relative;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 10px;
+    margin: 5px 0;
+    background-color: #ddd;
+    border-radius: 5px;
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 10px;
+    background: #b8860b;
+    border-radius: 5px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.range-labels {
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    top: 30px;
+    width: 100%;
+}
+
+.range-labels span {
+    color: #FFFFFF;
+    position: relative;
+    width: 20px;
+    text-align: center;
+}
 </style>

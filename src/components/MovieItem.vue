@@ -16,7 +16,7 @@ const { getGenresFromMovie } = useMoviesGenres()
 </script>
 
 <template>
-  <router-link :to="{name: 'movie-details', params: {movie_id: movie.id}}">
+  <router-link :to="{name: 'movie-details', params: {movie_id: movie.id}}" class="link__movie">
   <div class="movie">
     <div class="move__title">
       <img
@@ -65,13 +65,15 @@ const { getGenresFromMovie } = useMoviesGenres()
   justify-content: space-between;
   flex-direction: row;
   border-radius: 16px;
+    color: #ffffff;
+    list-style: none;
+    gap: 25px;
 }
 .movie:hover {
-  background-color: #f7f7f7;
+  opacity: 0.8;
 }
 .movie__content {
   padding: 10px 0;
-  margin-left: 5px;
   width: 500px;
   display: flex;
   flex-direction: column;
@@ -79,23 +81,22 @@ const { getGenresFromMovie } = useMoviesGenres()
   align-items: flex-start;
 }
 .movie__vote-average {
-  margin-right: 5px;
-  color: #00008B;
   font-size: 20px;
   font-weight: 600;
 }
 .movie__appraisal {
-  margin-left: 5px;
   display: flex;
+    gap: 10px;
 }
 .movie_genres {
-  padding: 8px;
-  font-size: 14px;
-  border: 1px solid #555;
-  border-radius: 3px;
-  width: 150px;
-  color: #333;
-  background-color: #f0f0f0;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #424242;
+    border-radius: 10px;
+    max-width: 115px;
+    width: 100%;
+    color: #FFFFFF;
+    background-color: transparent;
 }
 .move__title {
   display: flex;
@@ -104,12 +105,12 @@ const { getGenresFromMovie } = useMoviesGenres()
   display: flex;
   flex-wrap: wrap;
   list-style: none;
+    gap: 10px;
 }
 .movie__description {
   margin-top: 10px;
 }
-
-.movie__vote-count {
-  color: rgba(0,0,0,.6);
+.link__movie {
+    list-style: none;
 }
 </style>

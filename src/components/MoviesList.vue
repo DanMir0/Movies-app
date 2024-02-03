@@ -10,7 +10,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <div v-if="movies.length > 0">
+  <div v-if="movies.length > 0" class="lists">
       <movie-item :movie="movie" v-for="movie in movies" :key="movie.id"></movie-item>
   </div>
   <div v-else>
@@ -19,5 +19,7 @@ const props = defineProps({
 </template>
 
 <style scoped>
-
+.lists {
+    margin-top: 40px;
+}
 </style>

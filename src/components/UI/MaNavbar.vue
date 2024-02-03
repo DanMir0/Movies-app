@@ -1,7 +1,7 @@
 <script setup>
 import {useRouter} from "vue-router";
 import {ref} from "vue";
-import { AkSearch } from "@kalimahapps/vue-icons";
+import {AkSearch} from "@kalimahapps/vue-icons";
 
 const searchQuery = ref('')
 const router = useRouter()
@@ -9,17 +9,17 @@ const router = useRouter()
 </script>
 
 <template>
-  <div class="navbar">
-    <div class="logo">
-      <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-           width="140.000000pt" height="90.000000pt" viewBox="0 0 1280.000000 901.000000"
-           preserveAspectRatio="xMidYMid meet">
-        <metadata>
-          Created by potrace 1.15, written by Peter Selinger 2001-2017
-        </metadata>
-        <g transform="translate(0.000000,901.000000) scale(0.100000,-0.100000)"
-           fill="#ffffff" stroke="none">
-          <path d="M12090 8969 c-1960 -288 -3568 -834 -5115 -1737 -651 -380 -1307
+    <div class="navbar">
+        <div class="logo">
+            <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+                 width="140.000000pt" height="90.000000pt" viewBox="0 0 1280.000000 901.000000"
+                 preserveAspectRatio="xMidYMid meet">
+                <metadata>
+                    Created by potrace 1.15, written by Peter Selinger 2001-2017
+                </metadata>
+                <g transform="translate(0.000000,901.000000) scale(0.100000,-0.100000)"
+                   fill="#ffffff" stroke="none">
+                    <path d="M12090 8969 c-1960 -288 -3568 -834 -5115 -1737 -651 -380 -1307
 -842 -2090 -1472 -1187 -955 -1342 -1074 -1750 -1343 -878 -577 -1781 -914
 -2963 -1104 l-174 -28 6 -29 c3 -15 6 -38 6 -50 0 -45 11 -49 96 -36 44 6 86
 13 95 16 13 3 18 -5 23 -33 4 -21 9 -50 12 -64 l5 -27 -100 -12 c-70 -9 -101
@@ -174,89 +174,96 @@ m-359 -105 c8 -30 11 -57 7 -60 -12 -11 -213 -61 -226 -56 -10 4 -41 107 -34
 198 53 220 54 12 1 20 -11 28 -41z m-361 -95 c6 -31 8 -60 4 -64 -15 -12 -225
 -51 -233 -43 -4 5 -12 32 -17 60 l-10 52 111 25 c61 14 116 26 122 26 6 1 16
 -25 23 -56z"/>
-        </g>
-      </svg>
-      <div>
-        <h1 class="allison-regular">CineSphere</h1>
-        <hr>
-        <h2>Watch for Free</h2>
-      </div>
-    </div>
-    <div class="menu">
-      <router-link to="/filter">Movies</router-link>
-    </div>
-      <div class="block__search">
-          <ma-input
-              class="search"
-              v-model="searchQuery"
-              @keyup.enter="$emit('update:searchQuery', $event.target.value)"
-              @keydown.enter="router.push({ name: 'SearchPage', query: {q: searchQuery}})"
-              placeholder="Search..."
-          />
-          <span class="search-icon">
+                </g>
+            </svg>
+            <div>
+                <h1 class="allison-regular">CineSphere</h1>
+                <hr>
+                <h2>Watch for Free</h2>
+            </div>
+        </div>
+        <div class="menu">
+            <router-link to="/filter">Movies</router-link>
+        </div>
+        <div class="block__search">
+            <ma-input
+                class="search"
+                v-model="searchQuery"
+                @keyup.enter="$emit('update:searchQuery', $event.target.value)"
+                @keydown.enter="router.push({ name: 'SearchPage', query: {q: searchQuery}})"
+                placeholder="Search..."
+            />
+            <span class="search-icon">
         <AkSearch style="color: #FFFFFF;"></AkSearch>
     </span>
-      </div>
-  </div>
+        </div>
+    </div>
 </template>
 
 <style scoped>
 .navbar {
     padding: 20px;
-  background-color: #0f0f0f;
-  display: flex;
-  flex-direction: row;
+    background-color: #0f0f0f;
+    display: flex;
+    flex-direction: row;
     justify-content: space-between;
-  align-items: center;
+    align-items: center;
 }
 
 .logo {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
     gap: 50px;
 }
 
 h1 {
-  font-size: 60px;
+    font-size: 60px;
 }
+
 h2 {
-   font-size: 25px;
+    font-size: 25px;
     text-align: center;
 }
+
 h1,
 h2 {
-  color: #b8860b;
+    color: #b8860b;
 }
 
 hr {
-  border: none;
-  background-color: #b8860b;
-  color: #b8860b;
-  height: 2px;
+    border: none;
+    background-color: #b8860b;
+    color: #b8860b;
+    height: 2px;
 }
 
 .allison-regular {
-  font-family: "Allison", cursive;
-  font-weight: 400;
-  font-style: normal;
+    font-family: "Allison", cursive;
+    font-weight: 400;
+    font-style: normal;
 }
+
 .menu a {
     font-size: 25px;
     color: #FFFFFF;
     text-decoration: none;
 }
+
 .menu a:hover {
     color: #b8860b;
 }
+
 .block__search {
     max-width: 360px;
     width: 100%;
     position: relative;
 }
+
 .search {
     width: 100%;
     padding-right: 30px;
 }
+
 .search-icon {
     position: absolute;
     top: 50%;
