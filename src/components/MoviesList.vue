@@ -2,22 +2,22 @@
 import MovieItem from "@/components/MovieItem.vue";
 
 const props = defineProps({
-  movies: {
-    type: Array,
-    required: true,
-  }
+    movies: {
+        type: Array,
+        required: true,
+    }
 })
 </script>
 
 <template>
-  <div v-if="movies.length > 0" class="lists">
-      <movie-item :movie="movie" v-for="movie in movies" :key="movie.id"></movie-item>
-  </div>
-  <div v-else class="block">
-      <div class="content">
-          <h2>Lists is empty</h2>
-      </div>
-  </div>
+    <div v-if="movies.length > 0" class="lists">
+        <movie-item :movie="movie" v-for="movie in movies" :key="movie.id"></movie-item>
+    </div>
+    <div v-else class="block">
+        <div class="content">
+            <h2>Lists is empty</h2>
+        </div>
+    </div>
 </template>
 
 <style scoped>
@@ -29,10 +29,12 @@ h2 {
     color: #ffffff;
     text-align: center;
 }
+
 .block {
     display: flex;
     justify-content: center;
 }
+
 .content {
     padding: 50px;
     max-width: 450px;

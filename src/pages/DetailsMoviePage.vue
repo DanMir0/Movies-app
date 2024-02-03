@@ -15,6 +15,7 @@ const fetching = async () => {
     })
     movie.value = response.data
 }
+
 function getMoviePosterUrl(posterPath) {
     if (!posterPath) return
 
@@ -33,11 +34,11 @@ onMounted(() => {
                 <img :src="getMoviePosterUrl(movie.poster_path)" :alt="movie.title">
                 <div class="movie__grades">
                     <div>
-                        <p>{{parseFloat(movie.vote_average).toFixed(1)}}</p>
-                        <p>{{movie.vote_count}}</p>
+                        <p>{{ parseFloat(movie.vote_average).toFixed(1) }}</p>
+                        <p>{{ movie.vote_count }}</p>
                     </div>
                     <div>
-                        <p>{{parseFloat(movie.popularity).toFixed(1)}}</p>
+                        <p>{{ parseFloat(movie.popularity).toFixed(1) }}</p>
                     </div>
                 </div>
             </div>
@@ -55,15 +56,28 @@ onMounted(() => {
                     </div>
                     <div class="movie__items-value">
                         <p>{{ movie.original_title }}</p>
-                        <div class="group__item"><p v-for="(country, index) in movie.production_countries"> {{ country.name + (index < movie.production_countries.length - 1 ? ',&nbsp;' : ' ')}}</p></div>
-                        <div class="group__item"><p v-for="(genre, index) in movie.genres"> {{ genre.name + (index < movie.genres.length - 1 ? ',&nbsp;' : ' ') }}</p></div>
-                        <p>${{ movie.budget ? movie.budget.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '' }}</p>
-                        <p>${{ movie.revenue ? movie.revenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '' }}</p>
-                        <a :href="movie.homepage">{{movie.homepage}}</a>
-                        <a :href="`https://www.imdb.com/title/${movie.imdb_id}`">https://www.imdb.com/title/{{movie.imdb_id}}</a>
+                        <div class="group__item"><p v-for="(country, index) in movie.production_countries">
+                            {{ country.name + (index < movie.production_countries.length - 1 ? ',&nbsp;' : ' ') }}</p>
+                        </div>
+                        <div class="group__item"><p v-for="(genre, index) in movie.genres">
+                            {{ genre.name + (index < movie.genres.length - 1 ? ',&nbsp;' : ' ') }}</p></div>
+                        <p>${{
+                                movie.budget ? movie.budget.toLocaleString('en-US', {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0
+                                }) : ''
+                            }}</p>
+                        <p>${{
+                                movie.revenue ? movie.revenue.toLocaleString('en-US', {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0
+                                }) : ''
+                            }}</p>
+                        <a :href="movie.homepage">{{ movie.homepage }}</a>
+                        <a :href="`https://www.imdb.com/title/${movie.imdb_id}`">https://www.imdb.com/title/{{ movie.imdb_id }}</a>
                     </div>
                 </div>
-                <p>{{movie.overview}}</p>
+                <p>{{ movie.overview }}</p>
             </div>
         </div>
     </div>
@@ -98,6 +112,7 @@ onMounted(() => {
     flex-direction: column;
     gap: 10px;
 }
+
 .movie__items-name {
     display: flex;
     flex-direction: column;

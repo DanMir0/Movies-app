@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import {createRouter, createWebHistory} from 'vue-router';
 import SearchPage from "@/pages/SearchPage.vue";
 import FilterPage from "@/pages/FilterPage.vue";
 import DetailsMoviePage from "@/pages/DetailsMoviePage.vue";
