@@ -65,7 +65,6 @@ const {getGenresFromMovie} = useMoviesGenres()
     justify-content: space-between;
     flex-direction: row;
     border-radius: 16px;
-    color: #ffffff;
     list-style: none;
     gap: 25px;
 }
@@ -100,7 +99,6 @@ const {getGenresFromMovie} = useMoviesGenres()
     border-radius: 10px;
     max-width: 115px;
     width: 100%;
-    color: #FFFFFF;
     background-color: transparent;
 }
 
@@ -120,6 +118,6 @@ const {getGenresFromMovie} = useMoviesGenres()
 }
 
 .link__movie {
-    list-style: none;
+    text-decoration: none;
 }
 </style>

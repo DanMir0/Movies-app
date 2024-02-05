@@ -33,6 +33,8 @@ watch(() => route.query.q,
     () => {
         page.value = 1
         fetchingSearch()
+    }, {
+    immediate: true
     })
 
 watch(page, () => {

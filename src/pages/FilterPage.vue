@@ -86,16 +86,18 @@ watch([selectedYear, rating, selectedSort], () => {
                     {{ 2000 + year }}
                 </option>
             </select>
-            <div class="range-container">
-                <input
-                    type="range"
-                    min="0"
-                    max="10"
-                    step="0.1"
-                    v-model="rating"
-                >
-                <div class="range-labels">
-                    <span v-for="label in rangeLabels" :key="label">{{ label + 1 }}</span>
+            <div>
+                <div class="help-range"><span>{{rating}}</span></div>
+                <div class="range-container">
+                    <span>1</span>
+                    <input
+                        type="range"
+                        min="1"
+                        max="10"
+                        step="0.1"
+                        v-model="rating"
+                    >
+                    <span>10</span>
                 </div>
             </div>
             <ma-multi-select :genres="genres" @genreChange="genreChange"></ma-multi-select>
@@ -125,6 +127,7 @@ watch([selectedYear, rating, selectedSort], () => {
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    gap: 10px;
 }
 
 .filter-page {
@@ -136,7 +139,6 @@ watch([selectedYear, rating, selectedSort], () => {
 .select__solo {
     border-radius: 10px;
     background-color: transparent;
-    color: #FFFFFF;
     display: flex;
     width: 250px;
     height: 40px;
@@ -155,49 +157,59 @@ watch([selectedYear, rating, selectedSort], () => {
 }
 
 .range-container {
-    position: relative;
+    display: flex;
+    gap: 10px;
+    align-items: center;
 }
 
 input[type="range"] {
     -webkit-appearance: none;
+    appearance: none;
     width: 100%;
-    height: 10px;
-    margin: 5px 0;
-    background-color: #ddd;
-    border-radius: 5px;
+    cursor: pointer;
     outline: none;
+    overflow: hidden;
+    border-radius: 16px;
 }
 
 input[type="range"]::-webkit-slider-runnable-track {
-    width: 100%;
-    height: 10px;
-    background: #b8860b;
-    border-radius: 5px;
+    height: 15px;
+    background: #424242;
+    border-radius: 16px;
 }
 
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
-    background: #fff;
+    height: 15px;
+    width: 15px;
+    background-color: #fff;
     border-radius: 50%;
-    cursor: pointer;
-    z-index: 1;
+    border: 2px solid #b8860b;
+    box-shadow: -407px 0 0 400px #b8860b;
 }
 
-.range-labels {
-    display: flex;
-    justify-content: space-between;
-    position: absolute;
-    top: 30px;
-    width: 100%;
-}
-
-.range-labels span {
-    color: #FFFFFF;
+.help-range {
+    width: 30px;
+    height: 30px;
+    background: #ffffff;
+    border: 4px solid #b8860b;
+    border-bottom-left-radius: 50%;
+    border-top-right-radius: 50%;
+    border-top-left-radius: 50%;
+    transform: rotate(45deg);
     position: relative;
-    width: 20px;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    bottom: 5px;
+    left: 60px;
+}
+.help-range span {
+    align-items: center;
+    background: transparent;
+    transform: rotate(315deg);
+    position: absolute;
+    color: #000000;
 }
 </style>

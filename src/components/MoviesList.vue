@@ -26,7 +26,6 @@ const props = defineProps({
 }
 
 h2 {
-    color: #ffffff;
     text-align: center;
 }
 

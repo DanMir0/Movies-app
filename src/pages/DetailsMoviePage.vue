@@ -2,10 +2,10 @@
 import axios from "axios";
 import {onMounted, ref} from "vue";
 import {useRoute} from "vue-router";
+import { FaBandsImdb, MdOutlinedGrade, CaViewFilled } from "@kalimahapps/vue-icons";
 
 let movie = ref([])
 const route = useRoute()
-const movieLink = ref()
 
 const fetching = async () => {
     const response = await axios.get(`https://api.themoviedb.org/3/movie/${route.params.movie_id}`, {
@@ -33,12 +33,17 @@ onMounted(() => {
             <div>
                 <img :src="getMoviePosterUrl(movie.poster_path)" :alt="movie.title">
                 <div class="movie__grades">
-                    <div>
+                    <div class="group__grades">
+                        <FaBandsImdb class="icon__grade"></FaBandsImdb>
                         <p>{{ parseFloat(movie.vote_average).toFixed(1) }}</p>
+                    </div>
+                    <div class="group__grades">
+                        <MdOutlinedGrade class="icon__grade"></MdOutlinedGrade>
                         <p>{{ movie.vote_count }}</p>
                     </div>
-                    <div>
-                        <p>{{ parseFloat(movie.popularity).toFixed(1) }}</p>
+                    <div class="group__grades">
+                        <CaViewFilled class="icon__grade"></CaViewFilled>
+                        <p>{{ parseFloat(movie.popularity).toFixed() }}</p>
                     </div>
                 </div>
             </div>
@@ -117,5 +122,22 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     gap: 10px;
+}
+
+.movie__grades {
+    display: flex;
+    justify-content: space-around;
+}
+
+.group__grades {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.icon__grade {
+    width: 3em;
+    height: 1.4em;
 }
 </style>

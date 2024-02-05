@@ -16,6 +16,7 @@ import MaNavbar from "@/components/UI/MaNavbar.vue";
     padding: 0;
     box-sizing: border-box;
     background-color: #0f0f0f;
+    color: #FFFFFF;
 }
 
 .container {

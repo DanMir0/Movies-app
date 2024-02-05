@@ -5,7 +5,6 @@ import {AkSearch} from "@kalimahapps/vue-icons";
 
 const searchQuery = ref('')
 const router = useRouter()
-
 </script>
 
 <template>
@@ -190,11 +189,11 @@ m-359 -105 c8 -30 11 -57 7 -60 -12 -11 -213 -61 -226 -56 -10 4 -41 107 -34
                 class="search"
                 v-model="searchQuery"
                 @keyup.enter="$emit('update:searchQuery', $event.target.value)"
-                @keydown.enter="router.push({ name: 'SearchPage', query: {q: searchQuery}})"
+                @keydown.enter="router.push({ name: 'SearchPage', query: { q: searchQuery } })"
                 placeholder="Search..."
             />
             <span class="search-icon">
-        <AkSearch style="color: #FFFFFF;"></AkSearch>
+        <AkSearch></AkSearch>
     </span>
         </div>
     </div>
@@ -245,7 +244,6 @@ hr {
 
 .menu a {
     font-size: 25px;
-    color: #FFFFFF;
     text-decoration: none;
 }
 
