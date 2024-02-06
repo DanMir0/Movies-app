@@ -1,8 +1,9 @@
 import {createRouter, createWebHistory} from 'vue-router';
 import SearchPage from "@/pages/SearchPage.vue";
-import FilterPage from "@/pages/FilterPage.vue";
 import DetailsMoviePage from "@/pages/DetailsMoviePage.vue";
 import LoginPage from "@/pages/LoginPage.vue";
+import MaNavbar from "@/components/UI/MaNavbar.vue";
+import FilterPage from "@/pages/FilterPage.vue";
 
 const routes = [
     {
@@ -11,21 +12,28 @@ const routes = [
         component: LoginPage,
     },
     {
-        path: '/filter',
-        name: 'FilterPage',
-        component: FilterPage,
+        path: '/movies',
+        component: MaNavbar,
+        children: [
+            {
+                path: '',
+                name: 'FilterPage',
+                component: FilterPage
+            },
+            {
+                path: 'movies/search/',
+                name: 'SearchPage',
+                component: SearchPage,
+                props: true
+            },
+            {
+                path: '/movies/{:movie_id}',
+                name: 'movie-details',
+                component: DetailsMoviePage
+            },
+        ]
     },
-    {
-        path: '/search/',
-        name: 'SearchPage',
-        component: SearchPage,
-        props: true
-    },
-    {
-        path: '/movie/{:movie_id}',
-        name: 'movie-details',
-        component: DetailsMoviePage
-    }
+
 
 ]
 

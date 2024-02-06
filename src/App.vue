@@ -2,8 +2,8 @@
 </script>
 
 <template>
-    <div class="container">
-        <router-view></router-view>
+    <div>
+        <router-view  class="container"></router-view>
     </div>
 </template>
 
@@ -20,10 +20,5 @@
     margin: 0 auto;
     width: 100%;
     max-width: 1200px;
-}
-
-.navbar {
-    border-bottom: 1px solid #424242;
-    margin-bottom: 30px;
 }
 </style>

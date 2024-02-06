@@ -182,7 +182,7 @@ m-359 -105 c8 -30 11 -57 7 -60 -12 -11 -213 -61 -226 -56 -10 4 -41 107 -34
             </div>
         </div>
         <div class="menu">
-            <router-link to="/filter">Movies</router-link>
+            <router-link :to="{name: 'FilterPage'}">Movies</router-link>
         </div>
         <div class="block__search">
             <ma-input
@@ -197,6 +197,7 @@ m-359 -105 c8 -30 11 -57 7 -60 -12 -11 -213 -61 -226 -56 -10 4 -41 107 -34
     </span>
         </div>
     </div>
+    <router-view></router-view>
 </template>
 
 <style scoped>
@@ -207,6 +208,8 @@ m-359 -105 c8 -30 11 -57 7 -60 -12 -11 -213 -61 -226 -56 -10 4 -41 107 -34
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid #424242;
+    margin-bottom: 30px;
 }
 
 .logo {
