@@ -1,24 +1,33 @@
 <script setup>
 import MaInput from "@/components/UI/MaInput.vue";
 import {ref} from "vue";
-import {getAuth, signInWithEmailAndPassword} from "firebase/auth";
+import {getAuth, createUserWithEmailAndPassword, updateProfile} from "firebase/auth";
 import router from "@/router/router";
 
-const auth = getAuth();
 const email = ref('')
 const password = ref('')
-const user = ref([])
-const tokenResponse = ref([])
-const login = async () => {
-    try {
-        const response = await signInWithEmailAndPassword(auth, email.value, password.value)
-        user.value = response.user
-        tokenResponse.value = response._tokenResponse
-        router.push({name: 'FilterPage'})
-    } catch (e) {
+const confirmPassword = ref('')
 
+const tokenResponse = ref([])
+
+const auth = getAuth()
+const user = auth.currentUser
+const onSignUp = async () => {
+    try {
+        if (password.value !== confirmPassword.value) {
+
+        }
+        const response = await createUserWithEmailAndPassword(auth, email.value, password.value,)
+        tokenResponse.value = response._tokenResponse
+        await router.push({name: 'FilterPage'})
+    } catch (e) {
+        // позволяет вывести ошибку, пароль больше 6
     }
+
+
 }
+
+console.log(user)
 </script>
 
 <template>
@@ -28,10 +37,12 @@ const login = async () => {
             <div class="group__input">
                 <ma-input v-model="email" placeholder="Email"></ma-input>
                 <ma-input v-model="password" placeholder="Password"></ma-input>
-                <p>Forgot password?</p>
+                <ma-input v-model="confirmPassword" placeholder="Confirm password"></ma-input>
             </div>
-            <button class="button" @click="login">Sign in</button>
-            <p class="sign-up">Don't have an account? <router-link :to="{name: 'RegistrationPage'}">Sign Up</router-link></p>
+            <button class="button" @click="onSignUp">Sign up</button>
+            <p class="sign-in">Already Signing Up?
+                <router-link :to="{name: 'LoginPage'}">Login</router-link>
+            </p>
         </form>
     </div>
 </template>
@@ -84,11 +95,7 @@ input:focus {
     justify-content: center;
 }
 
-.group__input p {
-    margin-left: auto;
-}
-
-.sign-up {
+.sign-in {
     margin-top: 30px;
 }
 </style>

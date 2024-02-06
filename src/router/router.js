@@ -4,6 +4,7 @@ import DetailsMoviePage from "@/pages/DetailsMoviePage.vue";
 import LoginPage from "@/pages/LoginPage.vue";
 import MaNavbar from "@/components/UI/MaNavbar.vue";
 import FilterPage from "@/pages/FilterPage.vue";
+import RegistrationPage from "@/pages/RegistrationPage.vue";
 
 const routes = [
     {
@@ -33,7 +34,11 @@ const routes = [
             },
         ]
     },
-
+    {
+        path: '/sign-up',
+        name: 'RegistrationPage',
+        component: RegistrationPage,
+    },
 
 ]
 
