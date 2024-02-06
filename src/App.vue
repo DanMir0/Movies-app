@@ -1,13 +1,10 @@
 <script setup>
-import MaNavbar from "@/components/UI/MaNavbar.vue";
 </script>
 
 <template>
-    <ma-navbar class="navbar"></ma-navbar>
     <div class="container">
         <router-view></router-view>
     </div>
-
 </template>
 
 <style>
