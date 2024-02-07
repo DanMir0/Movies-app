@@ -3,7 +3,7 @@ import MaInput from "@/components/UI/MaInput.vue";
 import {ref} from "vue";
 import {getAuth, signInWithEmailAndPassword} from "firebase/auth";
 import router from "@/router/router";
-import { FeMail, ReLockPasswordLine  } from "@kalimahapps/vue-icons"
+import {FeMail, ReLockPasswordLine} from "@kalimahapps/vue-icons"
 
 const auth = getAuth();
 const email = ref('')
@@ -145,6 +145,7 @@ a:hover {
 .group__input {
     position: relative;
 }
+
 .icon {
     position: absolute;
     top: 50%;

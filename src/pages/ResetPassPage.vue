@@ -3,7 +3,7 @@ import {ref} from "vue";
 import {getAuth, sendPasswordResetEmail} from "firebase/auth";
 import MaModal from "@/components/UI/MaModal.vue";
 import router from "@/router/router";
-import { FeMail } from "@kalimahapps/vue-icons"
+import {FeMail} from "@kalimahapps/vue-icons"
 
 const email = ref('')
 const isOpen = ref(false)
@@ -125,10 +125,12 @@ a:hover {
 .form__error {
     border: 1px solid #ff0000;
 }
+
 .group__input {
     position: relative;
     width: 75%;
 }
+
 .icon {
     position: absolute;
     top: 50%;
