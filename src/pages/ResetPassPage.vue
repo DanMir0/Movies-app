@@ -3,7 +3,7 @@ import {ref} from "vue";
 import {getAuth, sendPasswordResetEmail} from "firebase/auth";
 import MaModal from "@/components/UI/MaModal.vue";
 import router from "@/router/router";
-import {FeMail} from "@kalimahapps/vue-icons"
+
 
 const email = ref('')
 const isOpen = ref(false)
@@ -38,7 +38,11 @@ const resetPassword = async () => {
             <div class="group__input">
                 <ma-input type="email" v-model="email" placeholder="Email"></ma-input>
                 <span class="icon">
-                    <FeMail></FeMail>
+                    <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd"
+                              d="M3.75 5.25L3 6V18L3.75 18.75H20.25L21 18V6L20.25 5.25H3.75ZM4.5 7.6955V17.25H19.5V7.69525L11.9999 14.5136L4.5 7.6955ZM18.3099 6.75H5.68986L11.9999 12.4864L18.3099 6.75Z"
+                              fill="#ffffff"/>
+                    </svg>
                 </span>
             </div>
             <p class="error" v-show="isError">{{ error }}</p>
@@ -55,7 +59,7 @@ const resetPassword = async () => {
 
 <style scoped>
 .block__page {
-    margin-top: 300px;
+    margin-top: 200px;
     display: flex;
     justify-content: center;
 }

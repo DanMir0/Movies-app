@@ -1,6 +1,5 @@
 <script setup>
 import {ref} from "vue";
-import {AkChevronDown, LiCross} from "@kalimahapps/vue-icons";
 
 const props = defineProps({
     genres: {
@@ -57,7 +56,7 @@ const toggleOptions = () => {
                 </div>
             </div>
             <span @click="toggleOptions" class="arrow">
-            <AkChevronDown></AkChevronDown>
+
         </span>
         </div>
         <div class="options" v-if="showOptions">
