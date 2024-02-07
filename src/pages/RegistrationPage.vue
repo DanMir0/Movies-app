@@ -33,7 +33,7 @@ console.log(user)
 <template>
     <div class="block__page">
         <form @submit.prevent class="form">
-            <h2>Sign-in</h2>
+            <h2>Sign Up</h2>
             <div class="group__input">
                 <ma-input v-model="email" placeholder="Email"></ma-input>
                 <ma-input v-model="password" placeholder="Password"></ma-input>

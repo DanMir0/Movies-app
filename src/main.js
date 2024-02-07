@@ -6,6 +6,7 @@ import MaInput from "@/components/UI/MaInput.vue";
 import MaMultiSelect from "@/components/UI/MaMultiSelect.vue";
 import {initializeApp} from "firebase/app";
 import {getAuth} from "firebase/auth";
+import MaModal from "@/components/UI/MaModal.vue";
 
 const app = createApp(App)
 
@@ -24,6 +25,7 @@ const firebaseApp = initializeApp(firebaseConfig);
 const auth = getAuth(firebaseApp)
 
 app
+    .component('ma-modal', MaModal)
     .component('ma-multi-select', MaMultiSelect)
     .component('ma-input', MaInput)
     .component('ma-pagination', MaPagination)

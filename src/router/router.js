@@ -5,6 +5,7 @@ import LoginPage from "@/pages/LoginPage.vue";
 import MaNavbar from "@/components/UI/MaNavbar.vue";
 import FilterPage from "@/pages/FilterPage.vue";
 import RegistrationPage from "@/pages/RegistrationPage.vue";
+import ResetPassPage from "@/pages/ResetPassPage.vue";
 
 const routes = [
     {
@@ -38,6 +39,11 @@ const routes = [
         path: '/sign-up',
         name: 'RegistrationPage',
         component: RegistrationPage,
+    },
+    {
+        path: '/reset-password',
+        name: 'ResetPasswordPage',
+        component: ResetPassPage,
     },
 
 ]

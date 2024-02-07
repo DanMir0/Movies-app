@@ -24,11 +24,11 @@ const login = async () => {
 <template>
     <div class="block__page">
         <form @submit.prevent class="form">
-            <h2>Sign-in</h2>
+            <h2>Sign in</h2>
             <div class="group__input">
                 <ma-input v-model="email" placeholder="Email"></ma-input>
                 <ma-input v-model="password" placeholder="Password"></ma-input>
-                <p>Forgot password?</p>
+                <span><router-link :to="{name: 'ResetPasswordPage'}">Forgot password?</router-link></span>
             </div>
             <button class="button" @click="login">Sign in</button>
             <p class="sign-up">Don't have an account? <router-link :to="{name: 'RegistrationPage'}">Sign Up</router-link></p>
