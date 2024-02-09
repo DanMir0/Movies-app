@@ -68,14 +68,16 @@ const displayedPages = computed(() => {
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 5px;
 }
 
 .page {
-    border: 1px solid black;
+    border: 1px solid #424242;
     padding: 10px;
+    border-radius: 1rem;
 }
 
 .current-page {
-    border: 2px solid teal;
+    border: 2px solid #b8860b;
 }
 </style>

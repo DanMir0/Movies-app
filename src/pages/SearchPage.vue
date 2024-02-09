@@ -43,6 +43,16 @@ watch(page, () => {
 </script>
 
 <template>
-    <movies-list :movies="searchedMovies"></movies-list>
-    <ma-pagination v-if="searchedMovies.length > 0" :total-pages="totalPages" :page="page" @change="changePage"/>
+    <div class="search-page">
+        <movies-list :movies="searchedMovies"></movies-list>
+        <ma-pagination v-if="searchedMovies.length > 0" :total-pages="totalPages" :page="page" @change="changePage"/>
+    </div>
 </template>
+
+<style scoped>
+.search-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+</style>

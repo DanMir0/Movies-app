@@ -3,12 +3,16 @@ const open = defineProps({
     type: Boolean,
     required: true
 })
-defineEmits(['close'])
+const emit = defineEmits(['close', 'openModal'])
+
+const openModal = () => {
+    emit('openModal')
+}
 </script>
 
 <template>
     <transition name="fade">
-        <div class="vue-modal">
+        <div class="vue-modal" id="maModal">
             <transition name="drop-in">
                 <div class="vue-modal-inner" v-show="open">
                     <div class="vue-modal-content">

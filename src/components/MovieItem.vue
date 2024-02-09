@@ -116,8 +116,4 @@ const {getGenresFromMovie} = useMoviesGenres()
 .movie__description {
     margin-top: 10px;
 }
-
-.link__movie {
-    text-decoration: none;
-}
 </style>

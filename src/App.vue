@@ -3,7 +3,7 @@
 
 <template>
     <div>
-        <router-view  class="container"></router-view>
+        <router-view></router-view>
     </div>
 </template>
 
@@ -14,11 +14,6 @@
     box-sizing: border-box;
     background-color: #0f0f0f;
     color: #FFFFFF;
-}
-
-.container {
-    margin: 0 auto;
-    width: 100%;
-    max-width: 1200px;
+    text-decoration: none;
 }
 </style>

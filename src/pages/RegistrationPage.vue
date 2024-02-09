@@ -51,13 +51,14 @@ const togglePasswordVisibility = () => {
 </script>
 
 <template>
-    <div class="block__page">
-        <form @submit.prevent class="form" :class="{'form__error': isError}">
-            <h2>Sign Up</h2>
-            <div class="group__blocks">
-                <div class="group__input">
-                    <ma-input type="email" v-model="email" placeholder="Email"></ma-input>
-                    <span class="icon">
+    <ma-container>
+        <div class="block__page">
+            <form @submit.prevent class="form" :class="{'form__error': isError}">
+                <h2>Sign Up</h2>
+                <div class="group__blocks">
+                    <div class="group__input">
+                        <ma-input type="email" v-model="email" placeholder="Email"></ma-input>
+                        <span class="icon">
                         <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none"
                              xmlns="http://www.w3.org/2000/svg">
                             <path fill-rule="evenodd" clip-rule="evenodd"
@@ -65,11 +66,11 @@ const togglePasswordVisibility = () => {
                                   fill="#ffffff"/>
                         </svg>
                     </span>
-                </div>
-                <div class="group__input">
-                    <ma-input :type="showPassword ? 'text' : 'password'" v-model="password"
-                              placeholder="Password"></ma-input>
-                    <span class="icon icon__password" @click="togglePasswordVisibility">
+                    </div>
+                    <div class="group__input">
+                        <ma-input :type="showPassword ? 'text' : 'password'" v-model="password"
+                                  placeholder="Password"></ma-input>
+                        <span class="icon icon__password" @click="togglePasswordVisibility">
                         <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none"
                              xmlns="http://www.w3.org/2000/svg"
                              v-show="!showPassword"
@@ -95,11 +96,11 @@ const togglePasswordVisibility = () => {
                                 fill="#ffffff"/>
                         </svg>
                     </span>
-                </div>
-                <div class="group__input">
-                    <ma-input :type="showPassword ? 'text' : 'password'" v-model="confirmPassword"
-                              placeholder="Confirm password"></ma-input>
-                    <span class="icon icon__password" @click="togglePasswordVisibility">
+                    </div>
+                    <div class="group__input">
+                        <ma-input :type="showPassword ? 'text' : 'password'" v-model="confirmPassword"
+                                  placeholder="Confirm password"></ma-input>
+                        <span class="icon icon__password" @click="togglePasswordVisibility">
                         <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none"
                              xmlns="http://www.w3.org/2000/svg"
                              v-show="!showPassword">
@@ -124,15 +125,16 @@ const togglePasswordVisibility = () => {
                                 fill="#ffffff"/>
                         </svg>
                     </span>
+                    </div>
                 </div>
-            </div>
-            <p class="error" v-show="isError">{{ error }}</p>
-            <button class="button" @click="onSignUp">Sign Up</button>
-            <p class="sign-in">Already Signing Up?
-                <router-link :to="{name: 'LoginPage'}">Login</router-link>
-            </p>
-        </form>
-    </div>
+                <p class="error" v-show="isError">{{ error }}</p>
+                <button class="button" @click="onSignUp">Sign Up</button>
+                <p class="sign-in">Already Signing Up?
+                    <router-link :to="{name: 'LoginPage'}">Login</router-link>
+                </p>
+            </form>
+        </div>
+    </ma-container>
 </template>
 
 <style scoped>
@@ -201,10 +203,6 @@ input:focus {
 
 .form__error {
     border: 1px solid #ff0000;
-}
-
-a {
-    text-decoration: none;
 }
 
 a:hover {

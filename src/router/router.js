@@ -6,15 +6,16 @@ import MaNavbar from "@/components/UI/MaNavbar.vue";
 import FilterPage from "@/pages/FilterPage.vue";
 import RegistrationPage from "@/pages/RegistrationPage.vue";
 import ResetPassPage from "@/pages/ResetPassPage.vue";
+import UserPage from "@/pages/UserPage.vue";
 
 const routes = [
     {
-        path: '/',
+        path: '/sign-in',
         name: 'LoginPage',
         component: LoginPage,
     },
     {
-        path: '/movies',
+        path: '/',
         component: MaNavbar,
         children: [
             {
@@ -23,15 +24,20 @@ const routes = [
                 component: FilterPage
             },
             {
-                path: 'movies/search/',
+                path: '/search/',
                 name: 'SearchPage',
                 component: SearchPage,
                 props: true
             },
             {
-                path: '/movies/{:movie_id}',
+                path: '/{:movie_id}',
                 name: 'movie-details',
                 component: DetailsMoviePage
+            },
+            {
+                path: '/profile',
+                name: 'UserPage',
+                component: UserPage
             },
         ]
     },
@@ -45,6 +51,7 @@ const routes = [
         name: 'ResetPasswordPage',
         component: ResetPassPage,
     },
+
 
 ]
 
