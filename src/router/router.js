@@ -7,6 +7,9 @@ import FilterPage from "@/pages/FilterPage.vue";
 import RegistrationPage from "@/pages/RegistrationPage.vue";
 import ResetPassPage from "@/pages/ResetPassPage.vue";
 import UserPage from "@/pages/UserPage.vue";
+import useUser from "@/composable/useUser";
+
+const {getCurrentUser} = useUser()
 
 const routes = [
     {
@@ -37,7 +40,8 @@ const routes = [
             {
                 path: '/profile',
                 name: 'UserPage',
-                component: UserPage
+                component: UserPage,
+                meta: {requiresAuth: true}
             },
         ]
     },
@@ -51,8 +55,6 @@ const routes = [
         name: 'ResetPasswordPage',
         component: ResetPassPage,
     },
-
-
 ]
 
 const router = createRouter({
@@ -60,4 +62,16 @@ const router = createRouter({
     history: createWebHistory(process.env.BASE_URL)
 })
 
+router.beforeEach(async (to,from, next) => {
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+     const user = await getCurrentUser();
+        if (user) {
+         next()
+     } else {
+         next({name: 'LoginPage'})
+     }
+    } else {
+        next()
+    }
+})
 export default router
