@@ -1,32 +1,29 @@
 <script setup>
 import {ref} from "vue";
-import {getAuth, sendPasswordResetEmail} from "firebase/auth";
+import { sendPasswordResetEmail} from "firebase/auth";
 import MaModal from "@/components/UI/MaModal.vue";
 import router from "@/router/router";
 import MaContainer from "@/components/UI/MaContainer.vue";
+import useUser from "@/composable/useUser";
 
-
+const {auth, resetPassword} = useUser()
 const email = ref('')
 const isOpen = ref(false)
-const auth = getAuth()
 const isError = ref(false)
 const error = ref('')
 const closeModal = () => {
     isOpen.value = !isOpen.value
     router.push({name: 'LoginPage'})
 }
-const resetPassword = async () => {
+
+const handlerResetPassword = async () => {
     try {
-        const response = await sendPasswordResetEmail(auth, email.value)
-        console.log(response)
+        await resetPassword(email.value)
         isOpen.value = true
     } catch (e) {
         isError.value = true
-        if (e.code === 'auth/missing-email') {
-            error.value = 'Enter the valid email.'
-        } else {
-            console.log(e)
-        }
+        error.value = e
+        console.log(error.value, isError.value)
     }
 }
 </script>
@@ -47,8 +44,8 @@ const resetPassword = async () => {
                     </svg>
                 </span>
                 </div>
-                <p class="error" v-show="isError">{{ error }}</p>
-                <button class="button" @click="resetPassword">Continue</button>
+                <p class="error" v-if="isError">{{ error }}</p>
+                <button class="button" @click="handlerResetPassword">Continue</button>
                 <p class="sign-in">Already Signing Up?
                     <router-link :to="{name: 'LoginPage'}">Login</router-link>
                 </p>

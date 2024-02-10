@@ -8,6 +8,7 @@ import MaModal from "@/components/UI/MaModal.vue";
 import MaContainer from "@/components/UI/MaContainer.vue";
 
 const app = createApp(App)
+
 app
     .component('ma-container', MaContainer)
     .component('ma-modal', MaModal)

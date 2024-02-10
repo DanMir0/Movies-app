@@ -4,14 +4,10 @@ const emit = defineEmits(['update:modelValue'])
 </script>
 
 <template>
-    <div class="ma-input">
-        <input
-            v-bind="$attrs"
-            :value="props.modelValue"
-            @input="emit('update:modelValue', $event.target.value)"
-        />
-        <slot name="icon"></slot>
-    </div>
+    <input
+        :value="props.modelValue"
+        @input="emit('update:modelValue', $event.target.value)"
+    />
 </template>
 
 <style scoped>
@@ -22,8 +18,5 @@ input {
     border-radius: 28px;
     border: 1px solid #424242;
     color: #f1f1f1;
-}
-.ma-input {
-    position: relative;
 }
 </style>

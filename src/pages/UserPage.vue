@@ -4,6 +4,8 @@ import {onMounted, ref} from "vue";
 import router from "@/router/router";
 import useUser from "@/composable/useUser";
 import MaModal from "@/components/UI/MaModal.vue";
+import MaInput from "@/components/UI/MaInput.vue";
+import MaSelectCountry from "@/components/UI/MaSelectCountry.vue";
 
 const isShowModal = ref(false)
 const errorMsg = ref('')
@@ -12,14 +14,17 @@ const openModal = (message) => {
     errorMsg.value = message
 }
 
-const {addProfile, auth, sendVerification, getCurrentUser} = useUser(openModal)
+const {updateProfileUser, getProfileUser, auth, sendVerification, getCurrentUser, resetPassword} = useUser()
 
-const email = ref()
-const username = ref()
-const password = ref('')
+const email = ref('')
+const username = ref('')
+const newPassword = ref('')
 const confirmPassword = ref('')
+const currentPassword = ref('')
 const isVerification = ref(false)
-
+const selectedSex = ref('')
+const country = ref('')
+const dateBirth = ref('')
 
 const userSignOut = () => {
     signOut(auth)
@@ -27,15 +32,19 @@ const userSignOut = () => {
 }
 
 const saveProfile = () => {
-    if (password.value !== confirmPassword.value) {
-        isShowModal.value = true
-        errorMsg.value = 'The passwords don\'t match.'
-    } else if (password.value === '' && confirmPassword.value === '') {
-        isShowModal.value = true
-        errorMsg.value = 'Please enter the password.'
+    if (newPassword.value) {
+        if (newPassword.value !== confirmPassword.value) {
+            openModal('The passwords don\'t match.')
+        } else if (newPassword.value === '' || confirmPassword.value === '' || currentPassword.value === '') {
+            openModal('Passwords do not match or the current password is not specified.')
+        }
+        else {
+            openModal('Try later.')
+        }
     } else {
         try {
-            addProfile(email.value, username.value, password.value)
+            updateProfileUser(username.value, currentPassword.value, newPassword.value, selectedSex.value, country.value, dateBirth.value)
+            openModal('The data has been changed.')
         } catch (e) {
             openModal(e.message)
         }
@@ -45,10 +54,25 @@ const saveProfile = () => {
 
 onMounted(async () => {
     let user = await getCurrentUser()
+    let profile = await getProfileUser(user.uid)
     email.value = user.email
     username.value = user.displayName
     isVerification.value = user.emailVerified
+    country.value = profile.country
+    selectedSex.value = profile.sex
+    dateBirth.value = profile.dateOfBirth
 })
+
+const handleResetPassword = async () => {
+    try {
+        await resetPassword(email.value)
+        openModal('We have sent a password reset to your email address.')
+    } catch (e) {
+        openModal(e)
+    }
+}
+
+
 </script>
 
 <template>
@@ -56,26 +80,25 @@ onMounted(async () => {
         <h2>Profile</h2>
         <form class="user__setting" @submit.prevent>
             <div class="setting__item">
-                <label for="userEmail">Email</label>
+                <label class="label__setting" for="userEmail">Email</label>
                 <ma-input
+                    class="email"
                     v-model="email"
                     id="userEmail"
                     placeholder="Email..."
-                >
-                    <template #icon>
-                        <span v-show="!isVerification" class="icon" @click="sendVerification">verifity</span>
-                        <span v-show="isVerification" class="icon">
-                            <svg width="15px" height="15px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-                                <path fill="#ffffff"
-                                      d="M77.248 415.04a64 64 0 0 1 90.496 0l226.304 226.304L846.528 188.8a64 64 0 1 1 90.56 90.496l-543.04 543.04-316.8-316.8a64 64 0 0 1 0-90.496z"/>
-                            </svg>
-                        </span>
-                    </template>
-                </ma-input>
+                    readonly
+                />
+                <span v-show="!isVerification" class="icon icon__verif" @click="sendVerification()">verif</span>
+                <span v-show="isVerification" class="icon">
+                    <svg width="15px" height="15px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#ffffff"
+                              d="M77.248 415.04a64 64 0 0 1 90.496 0l226.304 226.304L846.528 188.8a64 64 0 1 1 90.56 90.496l-543.04 543.04-316.8-316.8a64 64 0 0 1 0-90.496z"/>
+                    </svg>
+                </span>
                 <span class="help">If you change your email, a confirmation email will be sent to you.</span>
             </div>
             <div class="setting__item">
-                <label for="userName">Your username</label>
+                <label class="label__setting" for="userName">Your username</label>
                 <ma-input
                     v-model="username"
                     id="userName"
@@ -85,26 +108,58 @@ onMounted(async () => {
                 <span class="help">Name to be displayed.</span>
             </div>
             <div class="setting__item">
-                <label for="userPassword">New password (not necessarily)</label>
+                <p class="label__setting">Provide information about yourself (optional)</p>
+                <div class="setting__user-info">
+                    <div class="group__sex">
+                        <div class="sex__item">
+                            <input type="radio" id="man" value="man" v-model="selectedSex"/>
+                            <label class="label__gender" for="man">Man</label>
+                        </div>
+                        <div class="sex__item">
+                            <input type="radio" id="women" value="women" v-model="selectedSex"/>
+                            <label class="label__gender" for="women">Women</label>
+                        </div>
+                    </div>
+                    <ma-select-country v-model="country" :country="country" class="select__item"></ma-select-country>
+                    <ma-input type="date" v-model="dateBirth" placeholder="Date of birthay..."></ma-input>
+                </div>
+            </div>
+            <div class="setting__item">
+                <label class="label__setting" for="currentPassword">Current password</label>
                 <ma-input
-                    v-model="password"
-                    id="userPassword"
-                    placeholder="Password..."
+                    v-model="currentPassword"
+                    id="currentPassword"
+                    placeholder="Current password..."
+                >
+                </ma-input>
+                <div class="group__password">
+                    <span class="help">Enter the current password if you want change the password.</span>
+                    <button class="btn__forgot-password" @click="handleResetPassword">Forgot password?</button>
+                </div>
+            </div>
+            <div class="setting__item">
+                <label class="label__setting" for="newPassword">New password (not necessarily)</label>
+                <ma-input
+                    v-model="newPassword"
+                    id="newPassword"
+                    placeholder="New password..."
                 >
                 </ma-input>
                 <span class="help">If you do not need to change the password, leave the field blank.</span>
             </div>
             <div class="setting__item">
-                <label for="userConfPassword">Repeat password (not necessarily)</label>
+                <label class="label__setting" for="confirmPassword">Repeat password (not necessarily)</label>
                 <ma-input
                     v-model="confirmPassword"
-                    id="userConfPassword"
+                    id="confirmPassword"
                     placeholder="Repeat password...">
                 </ma-input>
                 <span class="help">If you do not need to change the password, leave the field blank.</span>
             </div>
-            <button @click="saveProfile()">Save</button>
-            <button @click="userSignOut">SignOut</button>
+            <div class="group__btn">
+                <button @click="userSignOut">SignOut</button>
+                <button @click="saveProfile">Save</button>
+            </div>
         </form>
     </div>
     <ma-modal @close="isShowModal =! isShowModal" v-show="isShowModal"><p>{{ errorMsg }}</p></ma-modal>
@@ -122,6 +177,8 @@ onMounted(async () => {
     flex-direction: column;
     align-items: center;
     gap: 30px;
+    max-width: 530px;
+    width: 100%;
 }
 
 .setting__item {
@@ -129,9 +186,10 @@ onMounted(async () => {
     display: flex;
     flex-direction: column;
     gap: 5px;
+    position: relative;
 }
 
-label {
+.label__setting {
     margin-left: 17px;
 }
 
@@ -157,14 +215,66 @@ button:hover {
     background-color: transparent;
     font-size: 12px;
     position: absolute;
-    top: 38%;
+    top: 43%;
     transform: translateY(-12%);
-    right: 5%;
+    right: 4%;
 }
 
-.icon__verifity:hover {
+.icon__verif:hover {
     opacity: 0.8;
     cursor: pointer;
 }
 
+#userEmail {
+    color: #7E7E7E;
+}
+
+.group__btn {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.group__password {
+    display: flex;
+    flex-direction: row;
+}
+
+.btn__forgot-password {
+    padding: 0;
+    background-color: transparent;
+}
+
+.btn__forgot-password:hover {
+    background-color: transparent;
+    opacity: 0.8;
+}
+
+.label__gender {
+    margin-left: 5px;
+}
+
+.group__sex {
+    display: flex;
+    gap: 5px;
+    flex-direction: column;
+}
+
+.sex__item {
+    display: flex;
+    align-items: center;
+}
+
+.setting__user-info {
+    padding-left: 17px;
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.select__item {
+    max-width: 300px;
+    border-radius: 28px;
+    border: 1px solid #424242;
+}
 </style>

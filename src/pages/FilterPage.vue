@@ -21,7 +21,6 @@ const selectedSort = ref('popularity.desc')
 const selectedGenres = ref([])
 
 const rating = ref()
-const rangeLabels = Array.from({length: 10}, (_, i) => i);
 
 const page = ref(1)
 const totalPages = ref(1)
