@@ -14,7 +14,7 @@ const openModal = (message) => {
     errorMsg.value = message
 }
 
-const {updateProfileUser, getProfileUser, auth, sendVerification, getCurrentUser, resetPassword} = useUser()
+const {updateProfileUser, userProfile, auth, sendVerification, getCurrentUser, resetPassword} = useUser()
 
 const email = ref('')
 const username = ref('')
@@ -22,9 +22,6 @@ const newPassword = ref('')
 const confirmPassword = ref('')
 const currentPassword = ref('')
 const isVerification = ref(false)
-const selectedSex = ref('')
-const country = ref('')
-const dateBirth = ref('')
 
 const userSignOut = () => {
     signOut(auth)
@@ -43,7 +40,13 @@ const saveProfile = () => {
         }
     } else {
         try {
-            updateProfileUser(username.value, currentPassword.value, newPassword.value, selectedSex.value, country.value, dateBirth.value)
+            updateProfileUser(
+                username.value,
+                currentPassword.value,
+                newPassword.value,
+                userProfile.value.sex,
+                userProfile.value.country,
+                userProfile.value.dateOfBirth)
             openModal('The data has been changed.')
         } catch (e) {
             openModal(e.message)
@@ -54,13 +57,9 @@ const saveProfile = () => {
 
 onMounted(async () => {
     let user = await getCurrentUser()
-    let profile = await getProfileUser(user.uid)
     email.value = user.email
     username.value = user.displayName
     isVerification.value = user.emailVerified
-    country.value = profile.country
-    selectedSex.value = profile.sex
-    dateBirth.value = profile.dateOfBirth
 })
 
 const handleResetPassword = async () => {
@@ -112,16 +111,16 @@ const handleResetPassword = async () => {
                 <div class="setting__user-info">
                     <div class="group__sex">
                         <div class="sex__item">
-                            <input type="radio" id="man" value="man" v-model="selectedSex"/>
+                            <input type="radio" id="man" value="man" v-model="userProfile.sex"/>
                             <label class="label__gender" for="man">Man</label>
                         </div>
                         <div class="sex__item">
-                            <input type="radio" id="women" value="women" v-model="selectedSex"/>
+                            <input type="radio" id="women" value="women" v-model="userProfile.sex"/>
                             <label class="label__gender" for="women">Women</label>
                         </div>
                     </div>
-                    <ma-select-country v-model="country" :country="country" class="select__item"></ma-select-country>
-                    <ma-input type="date" v-model="dateBirth" placeholder="Date of birthay..."></ma-input>
+                    <ma-select-country v-model="userProfile.country" class="select__item"></ma-select-country>
+                    <ma-input type="date" v-model="userProfile.dateOfBirth" placeholder="Date of birthay..."></ma-input>
                 </div>
             </div>
             <div class="setting__item">

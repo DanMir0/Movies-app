@@ -5,10 +5,12 @@ import router from "@/router/router";
 
 const searchQuery = ref('')
 const user = ref()
-const {getCurrentUser} = useUser()
+const {getCurrentUser, isAuth} = useUser()
+
 onMounted(async () => {
     user.value = await getCurrentUser()
 })
+console.log(isAuth)
 </script>
 
 <template>
@@ -40,11 +42,11 @@ onMounted(async () => {
                 </svg>
             </span>
         </div>
-        <div class="block__entry" v-if="user === null || user === undefined">
+        <div class="block__entry" v-show="!isAuth">
             <router-link :to="{name: 'LoginPage'}">Sign In</router-link>
             <router-link :to="{name: 'RegistrationPage'}">Sign Up</router-link>
         </div>
-        <div v-else>
+        <div v-show="isAuth">
             <router-link :to="{name: 'UserPage'}">Profile</router-link>
         </div>
 

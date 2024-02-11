@@ -5,28 +5,38 @@ import {
     updatePassword,
     updateProfile,
     reauthenticateWithCredential,
-    EmailAuthProvider, sendPasswordResetEmail
+    EmailAuthProvider,
+    sendPasswordResetEmail,
 } from "firebase/auth";
 import {db} from "@/confFirebase"
-import {doc, setDoc, onSnapshot} from "firebase/firestore"
+import {doc, setDoc, getDoc} from "firebase/firestore"
+import {ref} from "vue"
 
 let user = null;
+const userProfile = ref({})
 let promiseUser = null;
+const isAuth = ref(false)
 export default function useUser() {
     const auth = getAuth();
-
     const getCurrentUser = async () => {
         if (user) {
             return user
         } else {
-            if(!promiseUser) {
+            if (!promiseUser) {
                 promiseUser = new Promise((resolve, reject) => {
-                    onAuthStateChanged(auth, (currentUser) => {
+                    onAuthStateChanged(auth, async (currentUser) => {
                         console.log('useUser', currentUser)
                         if (currentUser) {
+                            isAuth.value = true
                             user = currentUser;
+                            const docSnap = await getDoc(doc(db, "users", user.uid));
+                            if (docSnap.exists()) {
+                                userProfile.value = docSnap.data()
+                            }
                         } else {
                             user = null
+                            userProfile.value = {}
+                            isAuth.value = false
                         }
                         resolve(user)
                     });
@@ -90,24 +100,13 @@ export default function useUser() {
         }
     }
 
-    const getProfileUser = async (userId) => {
-         return new Promise((resolve, reject) => {
-             const unsubscribe = onSnapshot(doc(db, 'users', userId), (doc) => {
-                 if (doc.exists()) {
-                     resolve(doc.data())
-                 } else {
-                     reject(new Error("Document does not exist"))
-                 }
-             })
-         })
-    }
-
     return {
         getCurrentUser,
         auth,
         updateProfileUser,
         sendVerification,
         resetPassword,
-        getProfileUser
+        userProfile,
+        isAuth
     }
 }
