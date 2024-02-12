@@ -43,8 +43,8 @@ onMounted( async () => {
     await fetching();
     let user = await getCurrentUser()
     await getMovieComments(movieId)
-    currentUserId.value = user.uid
-    username = user.displayName
+    currentUserId.value = user ? user.uid : ''
+    username = user ? user.displayName : ''
 })
 </script>
 
@@ -126,7 +126,8 @@ onMounted( async () => {
             </div>
         </div>
         <div class="comments__container">
-            <div class="comments__add">
+            <h3>Comments:</h3>
+            <div class="comments__add" v-if="currentUserId">
                 <textarea rows="5" class="input__add" placeholder="Add a comment..." v-model="inputComment"></textarea>
                 <button class="btn__add" @click="addComment">Add</button>
             </div>
