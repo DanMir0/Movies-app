@@ -2,10 +2,20 @@
 import axios from "axios";
 import {onMounted, ref} from "vue";
 import {useRoute} from "vue-router";
+import useUser from "@/composable/useUser";
+import useComments from "@/composable/useComments";
+
+let movieId = null
+let currentUserId = ref('')
+let username = ' '
 
 let movie = ref([])
 const route = useRoute()
+const inputComment = ref('')
+const {getCurrentUser} = useUser()
 
+
+const {addComments, getMovieComments, comments, deleteComment} = useComments()
 const fetching = async () => {
     const response = await axios.get(`https://api.themoviedb.org/3/movie/${route.params.movie_id}`, {
         params: {
@@ -13,21 +23,33 @@ const fetching = async () => {
         }
     })
     movie.value = response.data
+    movieId = response.data.id
 }
 
 function getMoviePosterUrl(posterPath) {
     if (!posterPath) return
-
     return `https://image.tmdb.org/t/p/w200${posterPath}`
 }
 
-onMounted(() => {
-    fetching();
+const addComment = async () => {
+    await addComments(movieId, currentUserId.value, username, inputComment.value)
+}
+
+const handleDeleteComment = async (movieId, commentId) => {
+    await deleteComment(movieId, commentId)
+}
+
+onMounted( async () => {
+    await fetching();
+    let user = await getCurrentUser()
+    await getMovieComments(movieId)
+    currentUserId.value = user.uid
+    username = user.displayName
 })
 </script>
 
 <template>
-    <div class="container">
+    <div class="movie__page">
         <div class=movie>
             <div>
                 <img :src="getMoviePosterUrl(movie.poster_path)" :alt="movie.title">
@@ -103,19 +125,37 @@ onMounted(() => {
                 <p>{{ movie.overview }}</p>
             </div>
         </div>
+        <div class="comments__container">
+            <div class="comments__add">
+                <textarea rows="5" class="input__add" placeholder="Add a comment..." v-model="inputComment"></textarea>
+                <button class="btn__add" @click="addComment">Add</button>
+            </div>
+            <div class="comments">
+                <div class="comment" v-for="comment in comments" :key="comment.id">
+                    <div class="comment__head">
+                        <span class="username">{{comment.username}}</span>
+                    </div>
+                    <p>{{comment.comment}}</p>
+                    <button v-if="currentUserId === comment.userId" class="btn__delete" @click="handleDeleteComment(movieId, comment.id)">Delete</button>
+                </div>
+            </div>
+        </div>
     </div>
+
 </template>
 
 <style scoped>
-.container {
-    margin: 0 auto;
-    width: 100%;
-    max-width: 1000px;
+.movie__page {
+  margin: 0 20px;
 }
-
 .movie {
     margin-top: 20px;
     display: flex;
+}
+
+.movie a:hover {
+    cursor: pointer;
+    opacity: 0.9;
 }
 
 .movie__description {
@@ -158,8 +198,62 @@ onMounted(() => {
     gap: 5px;
 }
 
-.icon__grade {
-    width: 3em;
-    height: 1.4em;
+.comments__container {
+    margin-top: 50px;
+}
+
+.comments__add {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.input__add {
+    border: none;
+    border-bottom: 1px solid #424242;
+    border-radius: 0px;
+}
+
+.input__add:focus {
+    outline: none;
+}
+
+.btn__add {
+    padding: 0.5em 2em;
+    max-width: 100px;
+    width: 100%;
+    background-color: #303030;
+    border: none;
+}
+
+.btn__add:hover {
+    background-color: #3e3e3e;
+    cursor: pointer;
+}
+
+.comment {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.comments {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.btn__delete {
+    font-size: 16px;
+    border: none;
+    width: 50px;
+    color: #999999;
+    border-bottom: 1px dashed;
+}
+
+.btn__delete:hover {
+    cursor: pointer;
+    opacity: 0.8;
 }
 </style>
