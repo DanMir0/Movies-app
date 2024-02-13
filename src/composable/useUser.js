@@ -8,7 +8,8 @@ import {
     EmailAuthProvider,
     sendPasswordResetEmail,
 } from "firebase/auth";
-import {db} from "@/confFirebase"
+import { getDownloadURL, ref as customStorageRef, uploadBytes } from "firebase/storage";
+import {db, storage} from "@/confFirebase"
 import {doc, setDoc, getDoc} from "firebase/firestore"
 import {ref} from "vue"
 
@@ -77,6 +78,44 @@ export default function useUser() {
         }
     }
 
+    const getPhotoUser = async () => {
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+            const storagePath = `/users/${currentUser.uid}/profilePhoto/[object File]`;
+            const photoRef = customStorageRef(storage, storagePath)
+            try {
+                const photoURL = await getDownloadURL(photoRef)
+                return photoURL
+            } catch (e) {
+                return null
+            }
+        } else {
+            return null
+        }
+    }
+    const updatePhoto = async (photo) => {
+        try {
+            const currentUser = auth.currentUser;
+            const storageRef = customStorageRef(storage, `users/${currentUser.uid}/profilePhoto/${photo}`);
+            const uploadTask = uploadBytes(storageRef, photo);
+
+            // Ждем завершения загрузки
+            await uploadTask;
+
+            // Получаем URL-адрес загруженной фотографии
+            const downloadURL = await getDownloadURL(storageRef);
+
+            // Обновляем профиль пользователя с URL-адресом фотографии
+            await updateProfile(currentUser, {
+                photoURL: downloadURL
+            });
+;           return downloadURL
+        } catch (error) {
+            console.error("Error updating profile photo:", error);
+            throw error;
+        }
+    }
+
     const sendVerification = async () => {
         const currentUser = auth.currentUser
         try {
@@ -107,6 +146,8 @@ export default function useUser() {
         sendVerification,
         resetPassword,
         userProfile,
-        isAuth
+        isAuth,
+        updatePhoto,
+        getPhotoUser
     }
 }

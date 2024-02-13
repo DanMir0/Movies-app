@@ -133,11 +133,16 @@ onMounted( async () => {
             </div>
             <div class="comments">
                 <div class="comment" v-for="comment in comments" :key="comment.id">
-                    <div class="comment__head">
-                        <span class="username">{{comment.username}}</span>
-                    </div>
-                    <p>{{comment.comment}}</p>
-                    <button v-if="currentUserId === comment.userId" class="btn__delete" @click="handleDeleteComment(movieId, comment.id)">Delete</button>
+                    <img :src="comment.photo">
+                   <div class="comment__body">
+                       <div class="comment__head">
+                           <span class="username">{{comment.username}}</span>
+                       </div>
+                       <div class="comment__down">
+                           <p>{{comment.comment}}</p>
+                           <button v-if="currentUserId === comment.userId" class="btn__delete" @click="handleDeleteComment(movieId, comment.id)">Delete</button>
+                       </div>
+                   </div>
                 </div>
             </div>
         </div>
@@ -234,7 +239,7 @@ onMounted( async () => {
 
 .comment {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 5px;
 }
 
@@ -256,5 +261,17 @@ onMounted( async () => {
 .btn__delete:hover {
     cursor: pointer;
     opacity: 0.8;
+}
+
+.comment__body {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.comment__down {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 </style>

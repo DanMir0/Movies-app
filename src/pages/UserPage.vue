@@ -3,8 +3,6 @@ import {signOut} from "firebase/auth"
 import {onMounted, ref} from "vue";
 import router from "@/router/router";
 import useUser from "@/composable/useUser";
-import MaModal from "@/components/UI/MaModal.vue";
-import MaInput from "@/components/UI/MaInput.vue";
 import MaSelectCountry from "@/components/UI/MaSelectCountry.vue";
 
 const isShowModal = ref(false)
@@ -14,7 +12,7 @@ const openModal = (message) => {
     errorMsg.value = message
 }
 
-const {updateProfileUser, userProfile, auth, sendVerification, getCurrentUser, resetPassword} = useUser()
+const {updateProfileUser, userProfile,updatePhoto, auth, sendVerification, getCurrentUser, resetPassword} = useUser()
 
 const email = ref('')
 const username = ref('')
@@ -22,20 +20,20 @@ const newPassword = ref('')
 const confirmPassword = ref('')
 const currentPassword = ref('')
 const isVerification = ref(false)
+const photoFile = ref()
 
 const userSignOut = () => {
     signOut(auth)
     router.push('/')
 }
 
-const saveProfile = () => {
+const saveProfile = async () => {
     if (newPassword.value) {
         if (newPassword.value !== confirmPassword.value) {
             openModal('The passwords don\'t match.')
         } else if (newPassword.value === '' || confirmPassword.value === '' || currentPassword.value === '') {
             openModal('Passwords do not match or the current password is not specified.')
-        }
-        else {
+        } else {
             openModal('Try later.')
         }
     } else {
@@ -55,13 +53,6 @@ const saveProfile = () => {
     }
 }
 
-onMounted(async () => {
-    let user = await getCurrentUser()
-    email.value = user.email
-    username.value = user.displayName
-    isVerification.value = user.emailVerified
-})
-
 const handleResetPassword = async () => {
     try {
         await resetPassword(email.value)
@@ -71,13 +62,29 @@ const handleResetPassword = async () => {
     }
 }
 
+const handlePhotoUpload = async (event) => {
+    const file = event.target.files[0];
+    const photo = await updatePhoto(file)
+    photoFile.value = photo
+}
 
+onMounted(async () => {
+    let user = await getCurrentUser()
+    email.value = user.email
+    username.value = user.displayName
+    isVerification.value = user.emailVerified
+    photoFile.value = user.photoURL
+})
 </script>
 
 <template>
     <div class="user__page">
-        <h2>Profile</h2>
         <form class="user__setting" @submit.prevent>
+            <div class="setting__item">
+                <img :src="photoFile" alt="Profile photo">
+                <input @change="handlePhotoUpload" type="file" name="file" id="file" class="inputfile"/>
+                <label for="file">Choose a file</label>
+            </div>
             <div class="setting__item">
                 <label class="label__setting" for="userEmail">Email</label>
                 <ma-input
@@ -275,5 +282,37 @@ button:hover {
     max-width: 300px;
     border-radius: 28px;
     border: 1px solid #424242;
+}
+
+.inputfile {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+.inputfile + label {
+    margin: 10px auto;
+    width: 120px;
+    padding: 0.5rem 1rem;
+    font-size: 16px;
+    color: white;
+    background-color: #303030;;
+    display: inline-block;
+}
+
+.inputfile:focus + label,
+.inputfile + label:hover {
+    background-color: #3e3e3e;
+    cursor: pointer;
+}
+
+img {
+    width: 160px;
+    border-radius: 50%;
+    height: 140px;
+    margin: 0 auto;
 }
 </style>

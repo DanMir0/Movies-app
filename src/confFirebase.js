@@ -1,5 +1,6 @@
 import {initializeApp} from "firebase/app";
 import {getFirestore} from "firebase/firestore"
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
     apiKey: "AIzaSyD7v2D6JqoaOmWIefdBxlBA98YlHO82ADU",
@@ -13,6 +14,6 @@ const firebaseConfig = {
 };
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp)
+const storage = getStorage(firebaseApp, "gs://movies-app-fa38f.appspot.com");
 
-
-export { db }
+export { db, storage }

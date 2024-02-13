@@ -4,13 +4,14 @@ import useUser from "@/composable/useUser";
 import router from "@/router/router";
 
 const searchQuery = ref('')
+const {getCurrentUser, isAuth, getPhotoUser } = useUser()
+const photo = ref(null)
 const user = ref()
-const {getCurrentUser, isAuth} = useUser()
-
 onMounted(async () => {
     user.value = await getCurrentUser()
+    photo.value = await getPhotoUser()
 })
-console.log(isAuth)
+
 </script>
 
 <template>
@@ -47,7 +48,9 @@ console.log(isAuth)
             <router-link :to="{name: 'RegistrationPage'}">Sign Up</router-link>
         </div>
         <div v-show="isAuth">
-            <router-link :to="{name: 'UserPage'}">Profile</router-link>
+            <router-link :to="{name: 'UserPage'}">
+                <img alt="profile" class="photo-profile" :src="photo">
+            </router-link>
         </div>
 
     </div>
@@ -124,7 +127,7 @@ hr {
 .search-icon {
     position: absolute;
     top: 52%;
-    right: 45px;
+    right: 15px;
     transform: translateY(-50%);
     pointer-events: none; /*Иконка не взаимодействует с событиями мыши */
 }
@@ -148,5 +151,15 @@ img {
 
 .block__entry a:hover {
     opacity: 0.8;
+}
+
+.photo-profile {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.photo-profile:hover {
+    opacity: 0.9;
 }
 </style>
