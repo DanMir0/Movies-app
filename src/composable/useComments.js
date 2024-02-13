@@ -5,7 +5,7 @@ import {ref} from "vue";
 let i = 0;
 export default function useComments() {
     const comments = ref([])
-    const addComments = async (movieId, userId, username, comment) => {
+    const addComments = async (movieId, userId, username, comment, grade) => {
         try {
             const commentsRef = collection(db, `all-comments/${movieId}/comments`);
             const docRef = await addDoc(commentsRef, {
@@ -13,10 +13,11 @@ export default function useComments() {
                 username: username,
                 comment: comment,
                 id: '',
+                grade: grade,
             });
             await updateDoc(docRef, {id: docRef.id})
             console.log("Comment added successfully.");
-            comments.value.push({userId, username, comment})
+            comments.value.push({userId, username, comment, grade})
         } catch (error) {
             console.error("Error adding comment:", error);
         }
@@ -30,7 +31,7 @@ export default function useComments() {
             const querySnapshot = await getDocs(q);
             comments.value = querySnapshot.docs.map(doc => doc.data())
         } catch (e) {
-            console.error(e)
+            console.error('get comment', e)
         }
     }
 
@@ -40,7 +41,7 @@ export default function useComments() {
             const commentDocRef = doc(db, `all-comments/${movieId}/comments/${commentId}` )
             await deleteDoc(commentDocRef)
         } catch (e) {
-            console.error(e)
+            console.error('delete com', e)
         }
     }
 
