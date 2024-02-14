@@ -33,9 +33,10 @@ const routes = [
                 props: true
             },
             {
-                path: '/{:movie_id}',
+                path: '/:movie_id',
                 name: 'movie-details',
-                component: DetailsMoviePage
+                component: DetailsMoviePage,
+                props: true
             },
             {
                 path: '/profile',

@@ -148,6 +148,7 @@ export default function useUser() {
         userProfile,
         isAuth,
         updatePhoto,
-        getPhotoUser
+        getPhotoUser,
+        user
     }
 }
