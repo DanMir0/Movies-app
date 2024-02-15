@@ -1,7 +1,6 @@
 <script setup>
 import axios from "axios";
-import {onMounted, ref, watchEffect} from "vue";
-import {useRoute} from "vue-router";
+import {computed, onMounted, ref, watchEffect} from "vue";
 import useUser from "@/composable/useUser";
 import useComments from "@/composable/useComments";
 import MaGrades from "@/components/UI/MaGrades.vue";
@@ -12,7 +11,6 @@ let props = defineProps({
   }
 })
 
-let movieId = null
 
 let currentUserId = ref('')
 let username = ' '
@@ -27,7 +25,11 @@ function updateGrades(val) {
   console.log(grades.value)
 }
 
-const {addComments, comments, deleteComment} = useComments()
+const movieId = computed(() => {
+  return props.movie_id
+})
+
+const {addComments, comments, deleteComment} = useComments(movieId)
 const fetching = async () => {
   const response = await axios.get(`https://api.themoviedb.org/3/movie/${props.movie_id}`, {
     params: {
@@ -35,7 +37,6 @@ const fetching = async () => {
     }
   })
   movie.value = response.data
-  movieId = response.data.id
 }
 
 function getMoviePosterUrl(posterPath) {

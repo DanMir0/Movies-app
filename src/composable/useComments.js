@@ -1,25 +1,23 @@
 import {db} from "@/confFirebase"
 import {addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc} from "firebase/firestore"
-import {ref, watch, watchEffect} from "vue";
-import {useRoute} from "vue-router";
+import {reactive, ref, watchEffect} from "vue";
 
-export default function useComments() {
+export default function useComments(movieId) {
   const comments = ref([])
-  const route = useRoute()
-  const getMovieComments = async (movieId) => {
-    if (!movieId) {
+  const getMovieComments = async () => {
+    if (!movieId.value) {
       comments.value = []
       return
     }
-    const commentsRef = collection(db, `all-comments/${movieId}/comments`);
+    const commentsRef = collection(db, `all-comments/${movieId.value}/comments`);
     const q = query(commentsRef);
 
     const querySnapshot = await getDocs(q);
     comments.value = querySnapshot.docs.map(doc => doc.data())
   }
 
-  watchEffect(() => route.params.movie_id, async () => {
-    await getMovieComments(route.params.movie_id)
+  watchEffect(async () => {
+    await getMovieComments()
   })
 
 
