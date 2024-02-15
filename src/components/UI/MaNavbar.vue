@@ -15,15 +15,15 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="navbar">
-        <div class="logo">
+    <header class="navbar">
+        <router-link :to="{name: 'FilterPage'}" class="logo">
             <img src="@/icons/logo.svg">
             <div>
                 <h1 class="allison-regular">CineSphere</h1>
                 <hr>
                 <h2>Watch for Free</h2>
             </div>
-        </div>
+        </router-link>
         <div class="menu">
             <router-link :to="{name: 'FilterPage'}">Movies</router-link>
         </div>
@@ -53,7 +53,7 @@ onMounted(async () => {
             </router-link>
         </div>
 
-    </div>
+    </header>
     <ma-container>
         <router-view></router-view>
     </ma-container>
@@ -62,7 +62,6 @@ onMounted(async () => {
 <style scoped>
 .navbar {
     padding: 20px;
-    background-color: #0f0f0f;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -75,7 +74,7 @@ onMounted(async () => {
 .logo {
     display: flex;
     align-items: center;
-    gap: 50px;
+    gap: 20px;
 }
 
 h1 {

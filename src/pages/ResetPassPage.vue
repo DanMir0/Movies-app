@@ -1,9 +1,6 @@
 <script setup>
 import {ref} from "vue";
-import { sendPasswordResetEmail} from "firebase/auth";
-import MaModal from "@/components/UI/MaModal.vue";
 import router from "@/router/router";
-import MaContainer from "@/components/UI/MaContainer.vue";
 import useUser from "@/composable/useUser";
 
 const {auth, resetPassword} = useUser()
@@ -30,12 +27,11 @@ const handlerResetPassword = async () => {
 
 <template>
     <ma-container>
-        <div class="block__page">
-            <form @submit.prevent class="form" :class="{'form__error': isError}">
+            <ma-form>
                 <h2>Reset password</h2>
                 <p>Enter your email address</p>
                 <div class="group__input">
-                    <ma-input type="email" v-model="email" placeholder="Email"></ma-input>
+                    <ma-input type="email" v-model="email" placeholder="Email" autocomplete="email"></ma-input>
                     <span class="icon">
                     <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" clip-rule="evenodd"
@@ -45,101 +41,38 @@ const handlerResetPassword = async () => {
                 </span>
                 </div>
                 <p class="error" v-if="isError">{{ error }}</p>
-                <button class="button" @click="handlerResetPassword">Continue</button>
+                <ma-button @click="handlerResetPassword">Continue</ma-button>
                 <p class="sign-in">Already Signing Up?
                     <router-link :to="{name: 'LoginPage'}">Login</router-link>
                 </p>
-            </form>
+            </ma-form>
             <ma-modal v-show="isOpen" :open="isOpen" @close="closeModal">
                 <h2 class="modal__msg">We have sent a password reset to your email address.</h2>
             </ma-modal>
-        </div>
     </ma-container>
 </template>
 
 <style scoped>
-.block__page {
-    margin-top: 200px;
-    display: flex;
-    justify-content: center;
-}
-
-.form {
-    padding: 50px 0;
-    max-width: 40%;
-    width: 100%;
-    border: 1px solid #b8860b;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 25px;
-    border-radius: 1.5rem;
-}
-
-input {
-    width: 100%;
-    border-radius: 0;
-    border: none;
-    border-bottom: 1px solid #b8860b;
-}
-
-input:focus {
-    outline: none;
-    padding: 15px 0;
-    width: calc(100% + 20px); /* увеличьте на 20px для отступов влево и вправо */
-    margin-left: -10px; /* отрицательный отступ влево */
-    margin-right: -10px; /* отрицательный отступ вправо */
-}
-
-.button {
-    padding: 10px;
-    background: #b8860b;
-    border: none;
-    max-width: 130px;
-    width: 100%;
-}
-
-.button:hover {
-    opacity: 0.9;
-}
-
-.sign-in {
-    margin-top: 30px;
-}
-
-.modal__msg {
-    background: transparent;
-    color: #000000;
-}
-
-a:hover {
-    opacity: 0.8;
-}
-
-.error {
-    color: #ff0000;
-    text-align: center;
-    margin-bottom: 15px;
-}
-
-.form__error {
-    border: 1px solid #ff0000;
-}
-
 .group__input {
+    width: 100%;
     position: relative;
-    width: 75%;
 }
 
 .icon {
     position: absolute;
-    top: 50%;
-    right: 10px; /* Установите отступ справа для положения иконки */
-    transform: translateY(-50%);
-    pointer-events: none; /* Иконка не взаимодействует с событиями мыши */
+    right: 16px;
+    top: 8px;
 }
 
-input:focus + .icon {
-    right: -5px; /* При фокусе сместить иконку вправо */
+a {
+    text-decoration: underline;
+}
+
+a:hover {
+    color: #b8860b;
+}
+
+.error {
+    color: #ff0000;
 }
 </style>

@@ -19,4 +19,9 @@ input {
     border: 1px solid #424242;
     color: #f1f1f1;
 }
+
+input:focus {
+    outline: none;
+    border: 2px solid #7E7E7E;
+}
 </style>

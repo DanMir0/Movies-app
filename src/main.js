@@ -6,10 +6,14 @@ import MaInput from "@/components/UI/MaInput.vue";
 import MaMultiSelect from "@/components/UI/MaMultiSelect.vue";
 import MaModal from "@/components/UI/MaModal.vue";
 import MaContainer from "@/components/UI/MaContainer.vue";
+import MaButton from "@/components/UI/MaButton.vue";
+import MaForm from "@/components/UI/MaForm.vue";
 
 const app = createApp(App)
 
 app
+    .component('ma-form', MaForm)
+    .component('ma-button', MaButton)
     .component('ma-container', MaContainer)
     .component('ma-modal', MaModal)
     .component('ma-multi-select', MaMultiSelect)
