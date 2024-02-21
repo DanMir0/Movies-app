@@ -4,14 +4,11 @@ import useUser from "@/composable/useUser";
 import router from "@/router/router";
 
 const searchQuery = ref('')
-const {getCurrentUser, isAuth, getPhotoUser } = useUser()
-const photo = ref(null)
-const user = ref()
-onMounted(async () => {
-    user.value = await getCurrentUser()
-    photo.value = await getPhotoUser()
-})
+const { getCurrentUser, user } = useUser()
 
+onMounted(async () => {
+    await getCurrentUser()
+})
 </script>
 
 <template>
@@ -43,14 +40,15 @@ onMounted(async () => {
                 </svg>
             </span>
         </div>
-        <div class="block__entry" v-show="!isAuth">
+        <div v-if="user.uid">
+            <router-link :to="{name: 'UserPage'}">
+                <p>profile</p>
+                <!--                <img alt="profile" class="photo-profile" :src="photo">-->
+            </router-link>
+        </div>
+        <div  class="block__entry" v-else>
             <router-link :to="{name: 'LoginPage'}">Sign In</router-link>
             <router-link :to="{name: 'RegistrationPage'}">Sign Up</router-link>
-        </div>
-        <div v-show="isAuth">
-            <router-link :to="{name: 'UserPage'}">
-                <img alt="profile" class="photo-profile" :src="photo">
-            </router-link>
         </div>
 
     </header>

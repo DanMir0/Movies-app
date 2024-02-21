@@ -11,41 +11,55 @@ import {
 import { getDownloadURL, ref as customStorageRef, uploadBytes } from "firebase/storage";
 import {db, storage} from "@/confFirebase"
 import {doc, setDoc, getDoc} from "firebase/firestore"
-import {ref} from "vue"
+import {ref, watch, watchEffect} from "vue"
 
-let user = null;
 const userProfile = ref({})
 let promiseUser = null;
-const isAuth = ref(false)
+
+const user = ref({
+    uid: null,
+    email: '',
+    displayName: null,
+    emailVerified: null,
+    country: null,
+    sex: null,
+    dateOfBirth: null,
+})
 export default function useUser() {
     const auth = getAuth();
+
+
     const getCurrentUser = async () => {
-        if (user) {
-            return user
+        if (user.value.uid) {
+            return user.value
         } else {
             if (!promiseUser) {
                 promiseUser = new Promise((resolve, reject) => {
                     onAuthStateChanged(auth, async (currentUser) => {
-                        console.log('useUser', currentUser)
                         if (currentUser) {
-                            isAuth.value = true
-                            user = currentUser;
-                            const docSnap = await getDoc(doc(db, "users", user.uid));
+                            user.value.email = currentUser.email
+                            user.value.uid = currentUser.uid
+                            user.value.displayName = currentUser.displayName
+                            user.value.emailVerified = currentUser.emailVerified
+
+                            const docSnap = await getDoc(doc(db, "users", user.value.uid));
                             if (docSnap.exists()) {
-                                userProfile.value = docSnap.data()
+                                user.value.country = docSnap.data().country
+                                user.value.sex = docSnap.data().sex
+                                user.value.dateOfBirth = docSnap.data().dateOfBirth
                             }
+
                         } else {
-                            user = null
-                            userProfile.value = {}
-                            isAuth.value = false
+                            user.value = {}
                         }
-                        resolve(user)
+                        resolve(user.value)
                     });
                 })
             }
             return promiseUser
         }
     }
+
     const updateProfileUser = async (username, currentPassword, password, sex, country, dateOfBirth) => {
         try {
             const currentUser = auth.currentUser
@@ -63,8 +77,8 @@ export default function useUser() {
                 })
             }
             if (password !== '') {
-                const credential =  EmailAuthProvider.credential(user.email, currentPassword)
-                await reauthenticateWithCredential(user, credential)
+                const credential =  EmailAuthProvider.credential(user.value.email, currentPassword)
+                await reauthenticateWithCredential(user.email, credential)
                 await updatePassword(currentUser, password)
             }
 
@@ -127,7 +141,7 @@ export default function useUser() {
 
     const resetPassword = async (email) => {
         try {
-            const response = await sendPasswordResetEmail(auth, email)
+           await sendPasswordResetEmail(auth, email)
         } catch (e) {
             if (e.code === 'auth/missing-email') {
                 throw 'The email field must not be empty.'
@@ -138,7 +152,9 @@ export default function useUser() {
             }
         }
     }
-
+    watch(user, async () => {
+     await getCurrentUser();
+    });
     return {
         getCurrentUser,
         auth,
@@ -146,8 +162,9 @@ export default function useUser() {
         sendVerification,
         resetPassword,
         userProfile,
-        isAuth,
         updatePhoto,
-        getPhotoUser
+        getPhotoUser,
+        user,
+
     }
 }

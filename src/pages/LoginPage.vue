@@ -1,14 +1,25 @@
 <script setup>
-import { ref} from "vue";
+import {computed, ref} from "vue";
 import {getAuth, signInWithEmailAndPassword} from "firebase/auth";
 import router from "@/router/router";
-import {isShowPassword, togglePasswordVisibility, passwordIcon} from "@/utils/showPassword"
 
 const auth = getAuth();
 const email = ref('')
 const password = ref('')
 const error = ref('')
 const isError = ref(false)
+
+const showPassword = ref(false);
+const passwordIcon = ref(false)
+
+const isShowPassword = computed(() => {
+    return showPassword.value ? 'text' : 'password';
+});
+
+const togglePasswordVisibility = () => {
+    passwordIcon.value = !passwordIcon.value
+    return showPassword.value = !showPassword.value;
+};
 
 const login = async () => {
     try {
