@@ -14,8 +14,22 @@ const movieId = computed(() => {
     return props.movieId
 })
 
-const {comments, loadMoreComments, deleteComment} = useComments(movieId)
+const {comments, loadMoreComments, deleteComment,isShowLoadComments} = useComments(movieId)
 const {user} = useUser()
+
+function formatDate(timestamp) {
+    const date = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
+
+    const months = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+    const day = date.getDate();
+    const monthIndex = date.getMonth();
+    const year = date.getFullYear();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+
+    return `${day} ${months[monthIndex]} ${year} г. в ${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
+}
+
 </script>
 
 <template>
@@ -28,14 +42,14 @@ const {user} = useUser()
             <div class="comment" v-for="comment in comments" :key="comment.id">
                 <div class="comment__head">
                     <p>{{ comment.username }}</p>
-                    <p class="comment__date">{{comment.date}}</p>
+                    <p class="comment__date">{{ formatDate(comment.date) }}</p>
                     <MaGrades :rating="comment.grade"/>
                 </div>
                 <p>{{ comment.comment }}</p>
                 <button class="btn__delete" @click="deleteComment(comment.id)">Delete</button>
             </div>
         </div>
-        <ma-button @click="loadMoreComments">Load more</ma-button>
+        <ma-button v-show="isShowLoadComments" @click="loadMoreComments">Load more</ma-button>
     </div>
 </template>
 
@@ -90,4 +104,3 @@ const {user} = useUser()
     color: #999999;
 }
 </style>
-

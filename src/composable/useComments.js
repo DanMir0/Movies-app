@@ -1,13 +1,13 @@
 import {db} from "@/confFirebase"
-import {collection,limit, orderBy, addDoc, query, updateDoc, getDocs, doc, deleteDoc} from "firebase/firestore"
-import {ref, watch, watchEffect} from "vue";
+import {collection, limit, orderBy, addDoc, query, updateDoc, getDocs, doc, deleteDoc} from "firebase/firestore"
+import {onMounted, ref, watch, watchEffect} from "vue";
 
 let i = 0;
 export default function useComments(movieId) {
 
     const comments = ref([])
-    const totalCommentsInPage = ref(10)
-
+    const totalCommentsInPage = ref(7)
+    let isShowLoadComments = ref(false)
     const getMovieComments = async () => {
 
         if (!movieId.value) {
@@ -22,27 +22,12 @@ export default function useComments(movieId) {
         const querySnapshot = await getDocs(q)
 
         comments.value = querySnapshot.docs.map(doc => doc.data())
-
+        updateIsShowLoadMoreComments(comments.value.length)
         return comments
     }
 
-    watchEffect(async () => {
-        await getMovieComments()
-    })
-
-    function formatDate() {
-        const date = new Date()
-        const months = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
-        const day = date.getDate();
-        const monthIndex = date.getMonth();
-        const year = date.getFullYear();
-        const hours = date.getHours();
-        const minutes = date.getMinutes();
-
-        return `${day} ${months[monthIndex]} ${year} г. в ${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
-    }
-
     const addComment = async (userId, username, comment, grade) => {
+        try {  const date = new Date()
             const commentsRef = collection(db, `all-comments/${movieId.value}/comments`);
 
             const docRef = await addDoc(commentsRef, {
@@ -51,12 +36,19 @@ export default function useComments(movieId) {
                 comment: comment,
                 id: '',
                 grade: grade,
-                date: formatDate()
+                date: date
             });
 
             await updateDoc(docRef, {id: docRef.id})
 
             comments.value.push({userId, username, comment, grade})
+            updateIsShowLoadMoreComments(comments.value.length)
+            console.log(comments.value.length, totalCommentsInPage.value, isShowLoadComments)
+            console.log('yes')
+        } catch (e) {
+            console.log('no')
+        }
+
     };
 
 
@@ -66,19 +58,36 @@ export default function useComments(movieId) {
         const commentDocRef = doc(db, `all-comments/${movieId.value}/comments/${commentId}`)
 
         await deleteDoc(commentDocRef)
+        updateIsShowLoadMoreComments(comments.value.length)
     }
-    watch(comments, async () => {
-       await getMovieComments()
-    })
 
     const loadMoreComments = async () => {
-        totalCommentsInPage.value += 10
+        totalCommentsInPage.value += 7
     }
+
+    const updateIsShowLoadMoreComments = (length) => {
+        if (length > totalCommentsInPage.value) {
+            isShowLoadComments.value = true
+        } else {
+            isShowLoadComments.value = false
+        }
+        return isShowLoadComments.value
+    }
+
+    watch(comments, async () => {
+        await getMovieComments()
+        updateIsShowLoadMoreComments()
+    })
+
+
+    onMounted(getMovieComments)
+
     return {
         comments,
         addComment,
         deleteComment,
         getMovieComments,
-        loadMoreComments
+        loadMoreComments,
+        isShowLoadComments
     }
 }
