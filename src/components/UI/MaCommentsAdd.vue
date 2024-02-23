@@ -6,7 +6,15 @@ import useComments from "@/composable/useComments";
 const highlightedStars = ref(0);
 const inputComment = ref('')
 const rating = ref(0)
+const inputRows = ref(3)
 
+const increaseRows = () => {
+    inputRows.value = 5
+}
+
+const resetRows = () => {
+    inputRows.value = 3
+}
 
 const props = defineProps({
     movieId: String
@@ -59,7 +67,7 @@ const onClickAddComment = async () => {
                 </svg>
             </div>
         </div>
-        <textarea rows="3" class="comment__input" placeholder="Add a comment..." v-model="inputComment"></textarea>
+        <textarea :rows="inputRows" @focus="increaseRows" @blur="resetRows" class="comment__input" placeholder="Add a comment..." v-model="inputComment"></textarea>
         <ma-button class="btn__add" @click="onClickAddComment">Add</ma-button>
     </div>
 </template>
@@ -79,6 +87,10 @@ const onClickAddComment = async () => {
     font-size: 17px;
     border: none;
     border-bottom: 1px solid #424242;
+}
+
+.comment__input:focus {
+outline: none;
 }
 
 .rating {

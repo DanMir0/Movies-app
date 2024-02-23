@@ -35,7 +35,7 @@ function formatDate(timestamp) {
 <template>
     <div class="comments__container">
         <div class="comments__title">
-            <h3>comments</h3>
+            <h3>{{comments.length}} comments</h3>
         </div>
         <MaCommentsAdd v-if="user.uid" :movieId="movieId"/>
         <div class="comments">
