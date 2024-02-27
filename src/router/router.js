@@ -8,10 +8,16 @@ import RegistrationPage from "@/pages/RegistrationPage.vue";
 import ResetPassPage from "@/pages/ResetPassPage.vue";
 import UserPage from "@/pages/UserPage.vue";
 import useUser from "@/composable/useUser";
+import NotFound from "@/pages/NotFound.vue";
 
 const {getCurrentUser} = useUser()
 
 const routes = [
+    {
+        path: '/:pathMatch(.*)',
+        name: 'NotFound',
+        component: NotFound
+    },
     {
         path: '/sign-in',
         name: 'LoginPage',
@@ -56,6 +62,7 @@ const routes = [
         name: 'ResetPasswordPage',
         component: ResetPassPage,
     },
+
 ]
 
 const router = createRouter({
