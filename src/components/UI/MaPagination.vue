@@ -80,4 +80,8 @@ const displayedPages = computed(() => {
 .current-page {
     border: 2px solid #b8860b;
 }
+
+a {
+    text-decoration: none;
+}
 </style>

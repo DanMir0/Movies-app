@@ -4,15 +4,28 @@ import {onMounted, ref} from "vue";
 import router from "@/router/router";
 import useUser from "@/composable/useUser";
 import MaSelectCountry from "@/components/UI/MaSelectCountry.vue";
+import MaToast from "@/components/UI/MaToast.vue";
 
-const isShowModal = ref(false)
-const errorMsg = ref('')
-const openModal = (message) => {
-    isShowModal.value = true
-    errorMsg.value = message
+const showToastMessage = ref(false);
+const toastMessage = ref("")
+const typeToast = ref('')
+
+function showToast(message, type) {
+    toastMessage.value = message
+    showToastMessage.value = true;
+    typeToast.value = type
 }
 
-const {updateProfileUser, userProfile,updatePhoto, auth, sendVerification, getCurrentUser, resetPassword} = useUser()
+const {
+    savePassword,
+    checkUsernameExists,
+    saveInfoUser,
+    user,
+    auth,
+    updateUsername,
+    sendVerification,
+    resetPassword
+} = useUser()
 
 const email = ref('')
 const username = ref('')
@@ -20,71 +33,96 @@ const newPassword = ref('')
 const confirmPassword = ref('')
 const currentPassword = ref('')
 const isVerification = ref(false)
-const photoFile = ref()
-
+const country = ref('')
+const sex = ref('')
+const dateOfBirth = ref('')
 const userSignOut = () => {
     signOut(auth)
     router.push('/')
 }
 
+const usernameError = ref('')
+const showUsernameError = ref(false)
+const confirmPasswordError = ref('')
+const showConfirmPasswordError = ref(false)
+const newPasswordError = ref('')
+const showNewPasswordError = ref(false)
+const currentPasswordError = ref('')
+const showCurrentPasswordError = ref(false)
 const saveProfile = async () => {
-    if (newPassword.value) {
-        if (newPassword.value !== confirmPassword.value) {
-            openModal('The passwords don\'t match.')
-        } else if (newPassword.value === '' || confirmPassword.value === '' || currentPassword.value === '') {
-            openModal('Passwords do not match or the current password is not specified.')
+    try {
+        if (username.value !== '' && username.value !== user.value.displayName) {
+            let isThereUsername = await checkUsernameExists(username)
+            if (isThereUsername) {
+                usernameError.value = 'The user already exists with this username.'
+                showUsernameError.value = true;
+            }
+            await updateUsername(username.value)
+            showUsernameError.value = false
+            showToast('Username changed!', 'success')
+        } else if (confirmPassword.value !== '' && newPassword.value !== '' && currentPassword.value !== '') {
+            if (newPassword.value === '' || newPassword.value.length < 6) {
+                newPasswordError.value = 'Password must be non-blank and more than 6 characters long'
+                showNewPasswordError.value = true
+            } else if (confirmPassword.value !== newPassword.value) {
+                confirmPasswordError.value = 'The passwords don\'t match'
+                showConfirmPasswordError.value = true
+            } else if (confirmPassword.value === '') {
+                confirmPasswordError.value = 'The field must not be empty'
+                showConfirmPasswordError.value = true
+            } else if (currentPassword.value === '') {
+                currentPasswordError.value = 'The field must not be empty'
+                showCurrentPasswordError.value = true
+            } else {
+                showConfirmPasswordError.value = false
+                showNewPasswordError.value = false
+                showCurrentPasswordError.value = false
+                await savePassword(currentPassword.value, newPassword.value)
+                showToast('Password changed!', 'success')
+                confirmPassword.value = ''
+                newPassword.value = ''
+                currentPassword.value = ''
+            }
         } else {
-            openModal('Try later.')
+            await saveInfoUser(sex.value, country.value, dateOfBirth.value)
+            showToast('Changed!', 'success')
         }
-    } else {
-        try {
-            updateProfileUser(
-                username.value,
-                currentPassword.value,
-                newPassword.value,
-                userProfile.value.sex,
-                userProfile.value.country,
-                userProfile.value.dateOfBirth)
-            openModal('The data has been changed.')
-        } catch (e) {
-            openModal(e.message)
-        }
-
+    } catch (error) {
+        showToast(error, 'error')
     }
 }
 
-const handleResetPassword = async () => {
+const onSendVerification = async () => {
+    try {
+        await sendVerification
+        showToast('Check your email!', 'success')
+    } catch (e) {
+        showToast(e, 'error')
+    }
+}
+
+const onResetPassword = async () => {
     try {
         await resetPassword(email.value)
-        openModal('We have sent a password reset to your email address.')
+        showToast('Check your email!', 'success')
     } catch (e) {
-        openModal(e)
+        showToast(e, 'error')
     }
-}
-
-const handlePhotoUpload = async (event) => {
-    const file = event.target.files[0];
-    const photo = await updatePhoto(file)
-    photoFile.value = photo
 }
 
 onMounted(async () => {
-    let user = await getCurrentUser()
-    email.value = user.email
-    username.value = user.displayName
-    isVerification.value = user.emailVerified
-    photoFile.value = user.photoURL
+    email.value = user.value.email
+    username.value = user.value.displayName
+    isVerification.value = user.value.emailVerified
+    sex.value = user.value.sex
+    country.value = user.value.country
+    dateOfBirth.value = user.value.dateOfBirth
 })
 </script>
 
 <template>
     <div class="user__page">
         <form class="user__setting" @submit.prevent>
-            <div class="setting__item">
-                <img :src="photoFile" alt="Profile photo">
-                <input @change="handlePhotoUpload" type="file" name="file" id="file" class="inputfile"/>
-                <label for="file">Choose a file</label>
-            </div>
             <div class="setting__item">
                 <label class="label__setting" for="userEmail">Email</label>
                 <ma-input
@@ -94,13 +132,9 @@ onMounted(async () => {
                     placeholder="Email..."
                     readonly
                 />
-                <span v-show="!isVerification" class="icon icon__verif" @click="sendVerification()">verif</span>
-                <span v-show="isVerification" class="icon">
-                    <svg width="15px" height="15px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-                        <path fill="#ffffff"
-                              d="M77.248 415.04a64 64 0 0 1 90.496 0l226.304 226.304L846.528 188.8a64 64 0 1 1 90.56 90.496l-543.04 543.04-316.8-316.8a64 64 0 0 1 0-90.496z"/>
-                    </svg>
-                </span>
+                <img v-if="!isVerification" src="@/icons/not-found.svg" @click="onSendVerification"
+                     class="icon icon__verif" alt="Email not verify"/>
+                <img v-else src="@/icons/not-found.svg" class="icon" alt="Email is verify"/>
                 <span class="help">If you change your email, a confirmation email will be sent to you.</span>
             </div>
             <div class="setting__item">
@@ -109,26 +143,31 @@ onMounted(async () => {
                     v-model="username"
                     id="userName"
                     placeholder="Username..."
+                    :class="{'error': showUsernameError}"
                 >
                 </ma-input>
-                <span class="help">Name to be displayed.</span>
+                <span v-if="!showUsernameError" class="help">Name to be displayed.</span>
+                <div v-else class="error-message">{{ usernameError }}</div>
             </div>
-            <div class="setting__item">
-                <p class="label__setting">Provide information about yourself (optional)</p>
-                <div class="setting__user-info">
+            <p class="label__info-user">Provide information about yourself (optional)</p>
+            <div class="setting__item setting__sex">
+                <p class="label__setting">Identify yourself</p>
+                <div class="group__info">
                     <div class="group__sex">
                         <div class="sex__item">
-                            <input type="radio" id="man" value="man" v-model="userProfile.sex"/>
+                            <input type="radio" id="man" value="man" v-model="sex"/>
                             <label class="label__gender" for="man">Man</label>
                         </div>
                         <div class="sex__item">
-                            <input type="radio" id="women" value="women" v-model="userProfile.sex"/>
+                            <input type="radio" id="women" value="women" v-model="sex"/>
                             <label class="label__gender" for="women">Women</label>
                         </div>
                     </div>
-                    <ma-select-country v-model="userProfile.country" class="select__item"></ma-select-country>
-                    <ma-input type="date" v-model="userProfile.dateOfBirth" placeholder="Date of birthay..."></ma-input>
+                    <input type="date" v-model="dateOfBirth" placeholder="Date of birthay..."/>
                 </div>
+            </div>
+            <div class="setting__item">
+                <ma-select-country v-model="country"></ma-select-country>
             </div>
             <div class="setting__item">
                 <label class="label__setting" for="currentPassword">Current password</label>
@@ -136,39 +175,48 @@ onMounted(async () => {
                     v-model="currentPassword"
                     id="currentPassword"
                     placeholder="Current password..."
+                    :class="{'error': showCurrentPasswordError}"
                 >
                 </ma-input>
-                <div class="group__password">
+                <div v-if="!showCurrentPasswordError" class="group__password">
                     <span class="help">Enter the current password if you want change the password.</span>
-                    <button class="btn__forgot-password" @click="handleResetPassword">Forgot password?</button>
+                    <a class="btn__forgot-password" href="#" @click="onResetPassword">Forgot password?</a>
                 </div>
+                <div v-else class="error-message">{{ currentPasswordError }} <a class="btn__forgot-password" href="#"
+                                                                                @click="handleResetPassword">Forgot
+                    password?</a></div>
             </div>
             <div class="setting__item">
-                <label class="label__setting" for="newPassword">New password (not necessarily)</label>
+                <label class="label__setting" for="newPassword">New password</label>
                 <ma-input
                     v-model="newPassword"
                     id="newPassword"
                     placeholder="New password..."
+                    :class="{'error': showNewPasswordError}"
                 >
                 </ma-input>
-                <span class="help">If you do not need to change the password, leave the field blank.</span>
+                <span v-if="!showNewPasswordError" class="help">If you do not need to change the password, leave the field blank.</span>
+                <div v-else class="error-message">{{ newPasswordError }}</div>
             </div>
             <div class="setting__item">
-                <label class="label__setting" for="confirmPassword">Repeat password (not necessarily)</label>
+                <label class="label__setting" for="confirmPassword">Repeat new password</label>
                 <ma-input
                     v-model="confirmPassword"
                     id="confirmPassword"
-                    placeholder="Repeat password...">
+                    placeholder="Repeat password..."
+                    :class="{'error': showConfirmPasswordError}"
+                >
                 </ma-input>
-                <span class="help">If you do not need to change the password, leave the field blank.</span>
+                <span v-if="!showConfirmPasswordError" class="help">If you do not need to change the password, leave the field blank.</span>
+                <div v-else class="error-message">{{ confirmPasswordError }}</div>
             </div>
             <div class="group__btn">
-                <button @click="userSignOut">SignOut</button>
-                <button @click="saveProfile">Save</button>
+                <ma-button @click="userSignOut">SignOut</ma-button>
+                <ma-button @click="saveProfile">Save</ma-button>
             </div>
         </form>
     </div>
-    <ma-modal @close="isShowModal =! isShowModal" v-show="isShowModal"><p>{{ errorMsg }}</p></ma-modal>
+    <MaToast :type="typeToast" :message="toastMessage" v-if="showToastMessage" @close="showToastMessage = false"/>
 </template>
 
 <style scoped>
@@ -204,19 +252,6 @@ onMounted(async () => {
     color: #999999;
 }
 
-button {
-    padding: 0.7em 1em;
-    background-color: #303030;
-    border: none;
-    max-width: 108px;
-    width: 100%;
-}
-
-button:hover {
-    background-color: #3e3e3e;
-    cursor: pointer;
-}
-
 .icon {
     background-color: transparent;
     font-size: 12px;
@@ -233,6 +268,12 @@ button:hover {
 
 #userEmail {
     color: #7E7E7E;
+}
+
+.group__info {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
 }
 
 .group__btn {
@@ -262,8 +303,8 @@ button:hover {
 
 .group__sex {
     display: flex;
-    gap: 5px;
-    flex-direction: column;
+    gap: 20px;
+    margin-left: 17px;
 }
 
 .sex__item {
@@ -271,48 +312,40 @@ button:hover {
     align-items: center;
 }
 
-.setting__user-info {
-    padding-left: 17px;
-    display: flex;
+.label__info-user {
+    text-align: center;
+}
+
+.setting__sex {
+    align-items: center;
     gap: 10px;
-    width: 100%;
 }
 
-.select__item {
-    max-width: 300px;
-    border-radius: 28px;
-    border: 1px solid #424242;
+input[type="date"] {
+    width: 220px;
+    background-color: #424242;
+    padding: 15px;
+    font-family: "Roboto Mono", monospace;
+    color: #ffffff;
+    font-size: 18px;
+    border: none;
+    outline: none;
+    border-radius: 5px;
 }
 
-.inputfile {
-    width: 0.1px;
-    height: 0.1px;
-    opacity: 0;
-    overflow: hidden;
-    position: absolute;
-    z-index: -1;
-}
-
-.inputfile + label {
-    margin: 10px auto;
-    width: 120px;
-    padding: 0.5rem 1rem;
-    font-size: 16px;
-    color: white;
-    background-color: #303030;;
-    display: inline-block;
-}
-
-.inputfile:focus + label,
-.inputfile + label:hover {
-    background-color: #3e3e3e;
+::-webkit-calendar-picker-indicator {
+    background-color: #ffffff;
+    padding: 5px;
     cursor: pointer;
+    border-radius: 3px;
 }
 
-img {
-    width: 160px;
-    border-radius: 50%;
-    height: 140px;
-    margin: 0 auto;
+.error-message {
+    margin-left: 17px;
+    color: #ff0000;
+}
+
+.error {
+    border: 1px solid #ff0000;
 }
 </style>

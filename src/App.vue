@@ -14,4 +14,12 @@
     color: #FFFFFF;
     text-decoration: none;
 }
+
+a {
+    text-decoration: underline;
+}
+
+a:hover {
+    color: #b8860b;
+}
 </style>

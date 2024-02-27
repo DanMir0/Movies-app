@@ -124,4 +124,8 @@ const {getGenresFromMovie} = useMoviesGenres()
     gap: 5px;
     align-items: center;;
 }
+
+.link__movie {
+    text-decoration: none;
+}
 </style>

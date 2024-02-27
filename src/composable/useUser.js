@@ -2,18 +2,17 @@ import {
     getAuth,
     onAuthStateChanged,
     sendEmailVerification,
-    updatePassword,
     updateProfile,
-    reauthenticateWithCredential,
     EmailAuthProvider,
     sendPasswordResetEmail,
+    reauthenticateWithCredential,
+    updatePassword,
 } from "firebase/auth";
-import { getDownloadURL, ref as customStorageRef, uploadBytes } from "firebase/storage";
-import {db, storage} from "@/confFirebase"
-import {doc, setDoc, getDoc} from "firebase/firestore"
-import {ref, watch, watchEffect} from "vue"
 
-const userProfile = ref({})
+import {db} from "@/confFirebase"
+import {doc, updateDoc, getDoc, where, getDocs, collection, query} from "firebase/firestore"
+import {ref, watch} from "vue"
+
 let promiseUser = null;
 
 const user = ref({
@@ -60,111 +59,141 @@ export default function useUser() {
         }
     }
 
-    const updateProfileUser = async (username, currentPassword, password, sex, country, dateOfBirth) => {
+
+    const updateUsername = async (username) => {
         try {
             const currentUser = auth.currentUser
             const userDocRef = doc(db, "users", currentUser.uid)
-
-            await setDoc(userDocRef, {
-                username: username,
-                sex: sex,
-                country: country,
-                dateOfBirth: dateOfBirth
+            await updateProfile(currentUser, {
+                displayName: username
             })
-            if (username !== '') {
-                await updateProfile(currentUser, {
-                    displayName: username,
-                })
-            }
-            if (password !== '') {
-                const credential =  EmailAuthProvider.credential(user.value.email, currentPassword)
-                await reauthenticateWithCredential(user.email, credential)
-                await updatePassword(currentUser, password)
-            }
-
+            await updateDoc(userDocRef, {
+                username: username
+            })
+            user.value.displayName = username
         } catch (e) {
-            if (e.code === 'auth/missing-password') {
-                throw 'Passwords do not match or the current password is not specified.'
-            } else if (e.code === 'auth/wrong-password') {
-                throw 'Current password is wrong.'
-            }
             throw e.message
         }
     }
 
-    const getPhotoUser = async () => {
-        const currentUser = auth.currentUser;
-        if (currentUser) {
-            const storagePath = `/users/${currentUser.uid}/profilePhoto/[object File]`;
-            const photoRef = customStorageRef(storage, storagePath)
-            try {
-                const photoURL = await getDownloadURL(photoRef)
-                return photoURL
-            } catch (e) {
-                return null
-            }
-        } else {
-            return null
-        }
-    }
-    const updatePhoto = async (photo) => {
+    const savePassword = async (currentPassword, password) => {
         try {
             const currentUser = auth.currentUser;
-            const storageRef = customStorageRef(storage, `users/${currentUser.uid}/profilePhoto/${photo}`);
-            const uploadTask = uploadBytes(storageRef, photo);
+            const credential = EmailAuthProvider.credential(currentUser.email, currentPassword);
 
-            // Ждем завершения загрузки
-            await uploadTask;
-
-            // Получаем URL-адрес загруженной фотографии
-            const downloadURL = await getDownloadURL(storageRef);
-
-            // Обновляем профиль пользователя с URL-адресом фотографии
-            await updateProfile(currentUser, {
-                photoURL: downloadURL
-            });
-;           return downloadURL
-        } catch (error) {
-            console.error("Error updating profile photo:", error);
-            throw error;
+            await reauthenticateWithCredential(currentUser, credential);
+            await updatePassword(currentUser, password);
+        } catch (e) {
+            if (e.code === 'auth/invalid-credential') {
+                throw 'Current password is incorrect'
+            } else {
+                throw e.message
+            }
         }
     }
+
+    const saveInfoUser = async (sex, country, dateOfBirth) => {
+        try {
+            const userDocRef = doc(db, "users", user.value.uid)
+            await updateDoc(userDocRef, {
+                sex: sex,
+                country: country,
+                dateOfBirth: dateOfBirth
+            })
+        } catch (e) {
+            throw e.message
+        }
+    }
+
+    // const updateProfileUser = async (username, currentPassword, password, sex, country, dateOfBirth) => {
+    //     try {
+    //         const currentUser = auth.currentUser
+    //         const userDocRef = doc(db, "users", currentUser.uid)
+    //
+    //         if (username !== '' && username !== currentUser.displayName) {
+    //             let check = await checkUsernameExists(username.value)
+    //
+    //             if (check) {
+    //                 throw ''
+    //             }
+    //
+    //             await updateProfile(currentUser, {
+    //                 displayName: username,
+    //             })
+    //             await setDoc(userDocRef, {
+    //                 username: username
+    //             })
+    //         }
+    //
+    //         if (password !== '') {
+    //             const credential =  EmailAuthProvider.credential(user.value.email, currentPassword)
+    //             await reauthenticateWithCredential(user.value.email, credential)
+    //             await updatePassword(currentUser, password)
+    //         }
+    //
+    //
+    //
+    //     } catch (e) {
+    //         if (e.code === 'auth/missing-password') {
+    //             throw 'Passwords do not match or the current password is not specified.'
+    //         } else if (e.code === 'auth/wrong-password') {
+    //             throw 'Current password is wrong.'
+    //         }
+    //         throw e.message
+    //     }
+    // }
 
     const sendVerification = async () => {
         const currentUser = auth.currentUser
         try {
             await sendEmailVerification(currentUser)
         } catch (e) {
-            return console.error(e)
+            throw e.message
         }
     }
 
     const resetPassword = async (email) => {
         try {
-           await sendPasswordResetEmail(auth, email)
+            await sendPasswordResetEmail(auth, email)
         } catch (e) {
             if (e.code === 'auth/missing-email') {
                 throw 'The email field must not be empty.'
             } else if (e.code === 'auth/invalid-email') {
                 throw 'Enter the valid email.'
             } else {
-                throw e
+                throw e.message
             }
         }
     }
+
+    async function checkUsernameExists(username) {
+        const usersCollection = collection(db, 'users')
+
+        const q = query(usersCollection, where('username', '==', username))
+
+        try {
+            const querySnapshot = await getDocs(q)
+
+            return !querySnapshot.empty
+        } catch (e) {
+            console.error('Ошибка при проверке существования пользователя:', e);
+            return false;
+        }
+    }
+
     watch(user, async () => {
-     await getCurrentUser();
+        await getCurrentUser();
     });
+
     return {
         getCurrentUser,
         auth,
-        updateProfileUser,
+        updateUsername,
         sendVerification,
         resetPassword,
-        userProfile,
-        updatePhoto,
-        getPhotoUser,
         user,
-
+        savePassword,
+        checkUsernameExists,
+        saveInfoUser
     }
 }

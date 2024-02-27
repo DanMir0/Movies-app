@@ -1,10 +1,9 @@
 <script setup>
 import useComments from "@/composable/useComments";
-import {computed, watch, watchEffect} from "vue";
+import {computed} from "vue";
 import MaGrades from "@/components/UI/MaGrades.vue";
 import MaCommentsAdd from "@/components/UI/MaCommentsAdd.vue";
 import useUser from "@/composable/useUser";
-import MaButton from "@/components/UI/MaButton.vue";
 
 const props = defineProps({
     movieId: String
@@ -14,7 +13,7 @@ const movieId = computed(() => {
     return props.movieId
 })
 
-const {comments, loadMoreComments, deleteComment,isShowLoadComments} = useComments(movieId)
+const {comments, deleteComment} = useComments(movieId)
 const {user} = useUser()
 
 function formatDate(timestamp) {
@@ -46,10 +45,9 @@ function formatDate(timestamp) {
                     <MaGrades :rating="comment.grade"/>
                 </div>
                 <p>{{ comment.comment }}</p>
-                <button class="btn__delete" @click="deleteComment(comment.id)">Delete</button>
+                <button v-if="comment.userId === user.uid" class="btn__delete" @click="deleteComment(comment.id)">Delete</button>
             </div>
         </div>
-        <ma-button v-show="isShowLoadComments" @click="loadMoreComments">Load more</ma-button>
     </div>
 </template>
 

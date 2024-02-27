@@ -13,7 +13,7 @@ onMounted(async () => {
 
 <template>
     <header class="navbar">
-        <router-link :to="{name: 'FilterPage'}" class="logo">
+        <router-link :to="{name: 'FilterPage'}" class="logo link">
             <img src="@/icons/logo.svg">
             <div>
                 <h1 class="allison-regular">CineSphere</h1>
@@ -22,7 +22,7 @@ onMounted(async () => {
             </div>
         </router-link>
         <div class="menu">
-            <router-link :to="{name: 'FilterPage'}">Movies</router-link>
+            <router-link class="link" :to="{name: 'FilterPage'}">Movies</router-link>
         </div>
         <div class="block__search">
             <ma-input
@@ -47,8 +47,8 @@ onMounted(async () => {
             </router-link>
         </div>
         <div  class="block__entry" v-else>
-            <router-link :to="{name: 'LoginPage'}">Sign In</router-link>
-            <router-link :to="{name: 'RegistrationPage'}">Sign Up</router-link>
+            <router-link class="link" :to="{name: 'LoginPage'}">Sign In</router-link>
+            <router-link class="link" :to="{name: 'RegistrationPage'}">Sign Up</router-link>
         </div>
 
     </header>
@@ -101,7 +101,9 @@ hr {
     font-weight: 400;
     font-style: normal;
 }
-
+.link {
+text-decoration: none;
+}
 .menu a {
     font-size: 25px;
 }
@@ -148,15 +150,5 @@ img {
 
 .block__entry a:hover {
     opacity: 0.8;
-}
-
-.photo-profile {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-}
-
-.photo-profile:hover {
-    opacity: 0.9;
 }
 </style>
