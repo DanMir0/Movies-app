@@ -2,18 +2,18 @@
 const props = defineProps({
     modelValue: String,
     type: String,
-    error: Boolean
+    isError: Boolean
 });
 const emit = defineEmits(['update:modelValue'])
 </script>
 
 <template>
-    <input
-        :type="props.type || 'text'"
-        :value="props.modelValue"
-        @input="emit('update:modelValue', $event.target.value)"
-        :class="{'error': error}"
-    />
+        <input
+            :type="props.type || 'text'"
+            :value="props.modelValue"
+            @input="emit('update:modelValue', $event.target.value)"
+            :class="{'error': isError}"
+        />
 </template>
 
 <style scoped>
@@ -27,11 +27,7 @@ input {
 }
 
 .error {
-    border: 1px solid #ff0000; /* Пример стилизации поля ввода при наличии ошибки */
-}
-
-.error-message {
-    color: red; /* Цвет текста сообщения об ошибке */
+    border: 1px solid #ff0000;
 }
 
 input:focus {

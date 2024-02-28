@@ -1,6 +1,6 @@
 <script setup>
 import {signOut} from "firebase/auth"
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import router from "@/router/router";
 import useUser from "@/composable/useUser";
 import MaSelectCountry from "@/components/UI/MaSelectCountry.vue";
@@ -16,9 +16,10 @@ function showToast(message, type) {
     typeToast.value = type
 }
 
+const isButtonClicked = ref(false)
+
 const {
     savePassword,
-    checkUsernameExists,
     saveInfoUser,
     user,
     auth,
@@ -41,54 +42,63 @@ const userSignOut = () => {
     router.push('/')
 }
 
-const usernameError = ref('')
-const showUsernameError = ref(false)
-const confirmPasswordError = ref('')
-const showConfirmPasswordError = ref(false)
-const newPasswordError = ref('')
-const showNewPasswordError = ref(false)
-const currentPasswordError = ref('')
-const showCurrentPasswordError = ref(false)
-const saveProfile = async () => {
-    try {
-        if (username.value !== '' && username.value !== user.value.displayName) {
-            let isThereUsername = await checkUsernameExists(username)
-            if (isThereUsername) {
-                usernameError.value = 'The user already exists with this username.'
-                showUsernameError.value = true;
-            }
-            await updateUsername(username.value)
-            showUsernameError.value = false
-            showToast('Username changed!', 'success')
-        } else if (confirmPassword.value !== '' && newPassword.value !== '' && currentPassword.value !== '') {
-            if (newPassword.value === '' || newPassword.value.length < 6) {
-                newPasswordError.value = 'Password must be non-blank and more than 6 characters long'
-                showNewPasswordError.value = true
-            } else if (confirmPassword.value !== newPassword.value) {
-                confirmPasswordError.value = 'The passwords don\'t match'
-                showConfirmPasswordError.value = true
-            } else if (confirmPassword.value === '') {
-                confirmPasswordError.value = 'The field must not be empty'
-                showConfirmPasswordError.value = true
-            } else if (currentPassword.value === '') {
-                currentPasswordError.value = 'The field must not be empty'
-                showCurrentPasswordError.value = true
-            } else {
-                showConfirmPasswordError.value = false
-                showNewPasswordError.value = false
-                showCurrentPasswordError.value = false
-                await savePassword(currentPassword.value, newPassword.value)
-                showToast('Password changed!', 'success')
-                confirmPassword.value = ''
-                newPassword.value = ''
-                currentPassword.value = ''
-            }
+const errorNewPassword = ref('')
+const errorConfirmPassword = ref('')
+const errorCurrentPassword= ref('')
+const errorUsername = ref('')
+
+function isValidPassword() {
+    if (!!currentPassword.value) {
+        if (newPassword.value === '') {
+            errorNewPassword.value = 'Field must not be empty.'
+        } else if (!/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/.test(newPassword.value)) {
+            errorNewPassword.value = 'Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters'
         } else {
-            await saveInfoUser(sex.value, country.value, dateOfBirth.value)
-            showToast('Changed!', 'success')
+            errorNewPassword.value = ''
         }
-    } catch (error) {
-        showToast(error, 'error')
+        if (confirmPassword.value === '') {
+            errorConfirmPassword.value = 'Field must not be empty.'
+        } else if (confirmPassword.value !== newPassword.value) {
+            errorConfirmPassword.value = 'The passwords don\'t match.'
+        } else {
+            errorConfirmPassword.value = ''
+        }
+    }
+    return true
+}
+
+const saveProfile = async () => {
+    let changesMade = false
+
+    if (currentPassword.value !== '') {
+       if (isValidPassword()) {
+           try {
+               await savePassword(currentPassword.value, newPassword.value)
+               showToast('Password changed', 'success')
+               changesMade = true
+           } catch (error) {
+               errorCurrentPassword.value = error
+           }
+       }
+    }
+    if ((username.value !== '' && username.value !== user.value.displayName)) {
+        try {
+            await updateUsername(username.value)
+            showToast('Username changed', 'success')
+            changesMade = true
+        } catch (error) {
+            errorUsername.value = error
+        }
+    } else if (username.value === '') {
+        errorUsername.value = 'Field must not be empty.'
+    }
+    if (sex.value !== user.value.sex || country.value !== user.value.country || dateOfBirth.value !== user.value.dateOfBirth) {
+        await saveInfoUser(sex.value, country.value, dateOfBirth.value)
+        changesMade = true
+        showToast('Changed!', 'success')
+    }
+    if (!changesMade) {
+        showToast('Nothing to change', 'info');
     }
 }
 
@@ -109,6 +119,21 @@ const onResetPassword = async () => {
         showToast(e, 'error')
     }
 }
+
+const handleButtonClick = async () => {
+    if (!isButtonClicked.value) {
+
+        isButtonClicked.value = true;
+
+        await saveProfile()
+
+        setTimeout(() => {
+            isButtonClicked.value = false;
+        }, 3000);
+    }
+};
+
+
 
 onMounted(async () => {
     email.value = user.value.email
@@ -143,11 +168,11 @@ onMounted(async () => {
                     v-model="username"
                     id="userName"
                     placeholder="Username..."
-                    :class="{'error': showUsernameError}"
+                    :isError="!!errorUsername"
                 >
                 </ma-input>
-                <span v-if="!showUsernameError" class="help">Name to be displayed.</span>
-                <div v-else class="error-message">{{ usernameError }}</div>
+                <span class="error-message" v-if="!!errorUsername">{{errorUsername}}</span>
+                <span  class="help">Name to be displayed.</span>
             </div>
             <p class="label__info-user">Provide information about yourself (optional)</p>
             <div class="setting__item setting__sex">
@@ -175,16 +200,14 @@ onMounted(async () => {
                     v-model="currentPassword"
                     id="currentPassword"
                     placeholder="Current password..."
-                    :class="{'error': showCurrentPasswordError}"
+                    :isError="!!errorCurrentPassword"
                 >
                 </ma-input>
-                <div v-if="!showCurrentPasswordError" class="group__password">
+               <span class="error-message" v-if="!!errorCurrentPassword">{{errorCurrentPassword}}</span>
+                <div class="group__password">
                     <span class="help">Enter the current password if you want change the password.</span>
                     <a class="btn__forgot-password" href="#" @click="onResetPassword">Forgot password?</a>
                 </div>
-                <div v-else class="error-message">{{ currentPasswordError }} <a class="btn__forgot-password" href="#"
-                                                                                @click="handleResetPassword">Forgot
-                    password?</a></div>
             </div>
             <div class="setting__item">
                 <label class="label__setting" for="newPassword">New password</label>
@@ -192,11 +215,11 @@ onMounted(async () => {
                     v-model="newPassword"
                     id="newPassword"
                     placeholder="New password..."
-                    :class="{'error': showNewPasswordError}"
+                    :isError="!!errorNewPassword"
                 >
                 </ma-input>
-                <span v-if="!showNewPasswordError" class="help">If you do not need to change the password, leave the field blank.</span>
-                <div v-else class="error-message">{{ newPasswordError }}</div>
+                <span class="error-message" v-if="!!errorNewPassword">{{errorNewPassword}}</span>
+                <span class="help">If you do not need to change the password, leave the field blank.</span>
             </div>
             <div class="setting__item">
                 <label class="label__setting" for="confirmPassword">Repeat new password</label>
@@ -204,15 +227,16 @@ onMounted(async () => {
                     v-model="confirmPassword"
                     id="confirmPassword"
                     placeholder="Repeat password..."
-                    :class="{'error': showConfirmPasswordError}"
+                    :isError="!!errorConfirmPassword"
                 >
                 </ma-input>
-                <span v-if="!showConfirmPasswordError" class="help">If you do not need to change the password, leave the field blank.</span>
-                <div v-else class="error-message">{{ confirmPasswordError }}</div>
+                <span class="error-message" v-if="!!errorConfirmPassword">{{errorConfirmPassword}}</span>
+                <span  class="help">If you do not need to change the password, leave the field blank.</span>
+
             </div>
             <div class="group__btn">
                 <ma-button @click="userSignOut">SignOut</ma-button>
-                <ma-button @click="saveProfile">Save</ma-button>
+                <ma-button @click="handleButtonClick" :disabled="isButtonClicked" :isDisabled="isButtonClicked">Save</ma-button>
             </div>
         </form>
     </div>
@@ -220,6 +244,11 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.error-message {
+    margin-left: 17px;
+    color: #ff0000;
+}
+
 .user__page {
     display: flex;
     flex-direction: column;
@@ -338,14 +367,5 @@ input[type="date"] {
     padding: 5px;
     cursor: pointer;
     border-radius: 3px;
-}
-
-.error-message {
-    margin-left: 17px;
-    color: #ff0000;
-}
-
-.error {
-    border: 1px solid #ff0000;
 }
 </style>

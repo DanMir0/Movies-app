@@ -59,18 +59,22 @@ export default function useUser() {
         }
     }
 
-
     const updateUsername = async (username) => {
         try {
-            const currentUser = auth.currentUser
-            const userDocRef = doc(db, "users", currentUser.uid)
-            await updateProfile(currentUser, {
-                displayName: username
-            })
-            await updateDoc(userDocRef, {
-                username: username
-            })
-            user.value.displayName = username
+            let isThereUsername = await checkUsernameExists(username)
+            if (isThereUsername) {
+                throw new Error('The user already exists with this username.')
+            } else {
+                const currentUser = auth.currentUser
+                const userDocRef = doc(db, "users", currentUser.uid)
+                await updateProfile(currentUser, {
+                    displayName: username
+                })
+                await updateDoc(userDocRef, {
+                    username: username
+                })
+                user.value.displayName = username
+            }
         } catch (e) {
             throw e.message
         }
@@ -86,6 +90,8 @@ export default function useUser() {
         } catch (e) {
             if (e.code === 'auth/invalid-credential') {
                 throw 'Current password is incorrect'
+            } else if (e.code === 'auth/too-many-requests') {
+                throw 'Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later.'
             } else {
                 throw e.message
             }
@@ -104,44 +110,6 @@ export default function useUser() {
             throw e.message
         }
     }
-
-    // const updateProfileUser = async (username, currentPassword, password, sex, country, dateOfBirth) => {
-    //     try {
-    //         const currentUser = auth.currentUser
-    //         const userDocRef = doc(db, "users", currentUser.uid)
-    //
-    //         if (username !== '' && username !== currentUser.displayName) {
-    //             let check = await checkUsernameExists(username.value)
-    //
-    //             if (check) {
-    //                 throw ''
-    //             }
-    //
-    //             await updateProfile(currentUser, {
-    //                 displayName: username,
-    //             })
-    //             await setDoc(userDocRef, {
-    //                 username: username
-    //             })
-    //         }
-    //
-    //         if (password !== '') {
-    //             const credential =  EmailAuthProvider.credential(user.value.email, currentPassword)
-    //             await reauthenticateWithCredential(user.value.email, credential)
-    //             await updatePassword(currentUser, password)
-    //         }
-    //
-    //
-    //
-    //     } catch (e) {
-    //         if (e.code === 'auth/missing-password') {
-    //             throw 'Passwords do not match or the current password is not specified.'
-    //         } else if (e.code === 'auth/wrong-password') {
-    //             throw 'Current password is wrong.'
-    //         }
-    //         throw e.message
-    //     }
-    // }
 
     const sendVerification = async () => {
         const currentUser = auth.currentUser
@@ -176,7 +144,6 @@ export default function useUser() {
 
             return !querySnapshot.empty
         } catch (e) {
-            console.error('Ошибка при проверке существования пользователя:', e);
             return false;
         }
     }

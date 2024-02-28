@@ -26,7 +26,7 @@ onMounted(() => {
 </script>
 
 <template>
-<div v-if="show" class="toast" :class="{'error': type === 'error', 'success': type === 'success'}">{{message}}</div>
+<div v-if="show" class="toast" :class="{'error': type === 'error', 'success': type === 'success', 'info': type === 'info'}">{{message}}</div>
 </template>
 
 <style scoped>
@@ -38,6 +38,10 @@ onMounted(() => {
     color: white;
     padding: 10px 20px;
     border-radius: 5px;
+}
+
+.info {
+    background-color: #2B4FB9;
 }
 
 .error {
