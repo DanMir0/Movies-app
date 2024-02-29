@@ -1,5 +1,5 @@
 <script setup>
-import {computed, onMounted, ref} from "vue";
+import {onMounted, ref} from "vue";
 import useUser from "@/composable/useUser";
 import MaSelectCountry from "@/components/UI/MaSelectCountry.vue";
 import MaToast from "@/components/UI/MaToast.vue";
@@ -13,8 +13,6 @@ function showToast(message, type) {
     showToastMessage.value = true;
     typeToast.value = type
 }
-
-const isButtonClicked = ref(false)
 
 const {
     savePassword,
@@ -38,7 +36,7 @@ const dateOfBirth = ref('')
 
 const errorNewPassword = ref('')
 const errorConfirmPassword = ref('')
-const errorCurrentPassword= ref('')
+const errorCurrentPassword = ref('')
 const errorUsername = ref('')
 
 function isValidPassword() {
@@ -62,24 +60,24 @@ function isValidPassword() {
 }
 
 const saveProfile = async () => {
-    let changesMade = false
-
     if (currentPassword.value !== '') {
-       if (isValidPassword()) {
-           try {
-               await savePassword(currentPassword.value, newPassword.value)
-               showToast('Password changed', 'success')
-               changesMade = true
-           } catch (error) {
-               errorCurrentPassword.value = error
-           }
-       }
+        if (isValidPassword()) {
+            try {
+                await savePassword(currentPassword.value, newPassword.value)
+                showToast('Password changed', 'success')
+
+            } catch (error) {
+                errorCurrentPassword.value = error
+            }
+        }
+    } else if ((newPassword.value !== '' && currentPassword.value === '') || (confirmPassword.value !== '' && currentPassword.value === '')) {
+        errorCurrentPassword.value = 'Field must not be empty.'
     }
     if ((username.value !== '' && username.value !== user.value.displayName)) {
         try {
             await updateUsername(username.value)
             showToast('Username changed', 'success')
-            changesMade = true
+
         } catch (error) {
             errorUsername.value = error
         }
@@ -88,11 +86,7 @@ const saveProfile = async () => {
     }
     if (sex.value !== user.value.sex || country.value !== user.value.country || dateOfBirth.value !== user.value.dateOfBirth) {
         await saveInfoUser(sex.value, country.value, dateOfBirth.value)
-        changesMade = true
         showToast('Changed!', 'success')
-    }
-    if (!changesMade) {
-        showToast('Nothing to change', 'info');
     }
 }
 
@@ -113,21 +107,6 @@ const onResetPassword = async () => {
         showToast(e, 'error')
     }
 }
-
-const handleButtonClick = async () => {
-    if (!isButtonClicked.value) {
-
-        isButtonClicked.value = true;
-
-        await saveProfile()
-
-        setTimeout(() => {
-            isButtonClicked.value = false;
-        }, 3000);
-    }
-};
-
-
 
 onMounted(async () => {
     email.value = user.value.email
@@ -165,8 +144,8 @@ onMounted(async () => {
                     :isError="!!errorUsername"
                 >
                 </ma-input>
-                <span class="error-message" v-if="!!errorUsername">{{errorUsername}}</span>
-                <span  class="help">Name to be displayed.</span>
+                <span class="error-message" v-if="!!errorUsername">{{ errorUsername }}</span>
+                <span class="help">Name to be displayed.</span>
             </div>
             <p class="label__info-user">Provide information about yourself (optional)</p>
             <div class="setting__item setting__sex">
@@ -197,7 +176,7 @@ onMounted(async () => {
                     :isError="!!errorCurrentPassword"
                 >
                 </ma-input>
-               <span class="error-message" v-if="!!errorCurrentPassword">{{errorCurrentPassword}}</span>
+                <span class="error-message" v-if="!!errorCurrentPassword">{{ errorCurrentPassword }}</span>
                 <div class="group__password">
                     <span class="help">Enter the current password if you want change the password.</span>
                     <a class="btn__forgot-password" href="#" @click="onResetPassword">Forgot password?</a>
@@ -212,7 +191,7 @@ onMounted(async () => {
                     :isError="!!errorNewPassword"
                 >
                 </ma-input>
-                <span class="error-message" v-if="!!errorNewPassword">{{errorNewPassword}}</span>
+                <span class="error-message" v-if="!!errorNewPassword">{{ errorNewPassword }}</span>
                 <span class="help">If you do not need to change the password, leave the field blank.</span>
             </div>
             <div class="setting__item">
@@ -224,11 +203,11 @@ onMounted(async () => {
                     :isError="!!errorConfirmPassword"
                 >
                 </ma-input>
-                <span class="error-message" v-if="!!errorConfirmPassword">{{errorConfirmPassword}}</span>
-                <span  class="help">If you do not need to change the password, leave the field blank.</span>
+                <span class="error-message" v-if="!!errorConfirmPassword">{{ errorConfirmPassword }}</span>
+                <span class="help">If you do not need to change the password, leave the field blank.</span>
 
             </div>
-                <ma-button @click="handleButtonClick" :disabled="isButtonClicked" :isDisabled="isButtonClicked">Save</ma-button>
+            <ma-button @click="saveProfile">Save</ma-button>
         </form>
     </div>
     <MaToast :type="typeToast" :message="toastMessage" v-if="showToastMessage" @close="showToastMessage = false"/>
