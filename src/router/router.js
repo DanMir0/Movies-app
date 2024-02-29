@@ -6,7 +6,7 @@ import MaNavbar from "@/components/UI/MaNavbar.vue";
 import FilterPage from "@/pages/FilterPage.vue";
 import RegistrationPage from "@/pages/RegistrationPage.vue";
 import ResetPassPage from "@/pages/ResetPassPage.vue";
-import UserPage from "@/pages/UserPage.vue";
+import ProfilePage from "@/pages/ProfilePage.vue";
 import useUser from "@/composable/useUser";
 import NotFound from "@/pages/NotFound.vue";
 
@@ -46,8 +46,8 @@ const routes = [
             },
             {
                 path: '/profile',
-                name: 'UserPage',
-                component: UserPage,
+                name: 'ProfilePage',
+                component: ProfilePage,
                 meta: {requiresAuth: true}
             },
         ]

@@ -1,20 +1,47 @@
 <script setup>
-import {onMounted, ref} from "vue";
+import {onMounted, onUnmounted, ref} from "vue";
 import useUser from "@/composable/useUser";
-import router from "@/router/router";
+import {signOut} from "firebase/auth";
 
 const searchQuery = ref('')
-const { getCurrentUser, user } = useUser()
+const {getCurrentUser, auth, user} = useUser()
 
 onMounted(async () => {
     await getCurrentUser()
 })
+
+const userSignOut = () => {
+    signOut(auth)
+}
+
+const showDropdown = ref(false)
+const handleClickOutside = (event) => {
+    if (user.value.uid) {
+        const dropdown = document.querySelector('.dropdown');
+        const profileButton = document.querySelector('.dropdown__open');
+        if (!dropdown.contains(event.target) && !profileButton.contains(event.target)) {
+            showDropdown.value = false;
+        }
+    }
+};
+
+function toggleDropdown() {
+    showDropdown.value = !showDropdown.value
+}
+
+onMounted(() => {
+    document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+    document.removeEventListener('click', handleClickOutside);
+});
 </script>
 
 <template>
-    <header class="navbar">
+    <header class="navbar" >
         <router-link :to="{name: 'FilterPage'}" class="logo link">
-            <img src="@/icons/logo.svg">
+            <img class="logo__img" src="@/icons/logo.svg">
             <div>
                 <h1 class="allison-regular">CineSphere</h1>
                 <hr>
@@ -40,13 +67,22 @@ onMounted(async () => {
                 </svg>
             </span>
         </div>
-        <div v-if="user.uid">
-            <router-link :to="{name: 'UserPage'}">
-                <p>profile</p>
-                <!--                <img alt="profile" class="photo-profile" :src="photo">-->
-            </router-link>
+        <div v-if="user.uid" class="dropdown__open">
+            <p @click="toggleDropdown">profile</p>
+            <div v-show="showDropdown" class="dropdown">
+                <ul class="dropdown__lists">
+                    <li class="dropdown__list">
+                        <img class="dropdown__icon" src="@/icons/profile.svg">
+                        <router-link :to="{name: 'ProfilePage'}">Profile</router-link>
+                    </li>
+                    <li class="dropdown__list">
+                        <img class="dropdown__icon" src="@/icons/exit.svg">
+                        <router-link @click="userSignOut" to="/">Sign Out</router-link>
+                    </li>
+                </ul>
+            </div>
         </div>
-        <div  class="block__entry" v-else>
+        <div class="block__entry" v-else>
             <router-link class="link" :to="{name: 'LoginPage'}">Sign In</router-link>
             <router-link class="link" :to="{name: 'RegistrationPage'}">Sign Up</router-link>
         </div>
@@ -101,9 +137,11 @@ hr {
     font-weight: 400;
     font-style: normal;
 }
+
 .link {
-text-decoration: none;
+    text-decoration: none;
 }
+
 .menu a {
     font-size: 25px;
 }
@@ -131,7 +169,7 @@ text-decoration: none;
     pointer-events: none; /*Иконка не взаимодействует с событиями мыши */
 }
 
-img {
+.logo__img {
     width: 150px;
 }
 
@@ -150,5 +188,36 @@ img {
 
 .block__entry a:hover {
     opacity: 0.8;
+}
+
+.dropdown__open {
+    position: relative;
+}
+
+.dropdown {
+    width: 120px;
+    right: 0;
+    position: absolute;
+    border: 1px solid #424242;
+    box-shadow: 0px 4px 6px 2px #090909;
+    background-color: #0f0f0f;
+    padding: 15px;
+}
+
+.dropdown__lists {
+    color: #ffffff;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.dropdown__icon {
+    width: 20px;
+}
+.dropdown__list {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 </style>

@@ -1,7 +1,5 @@
 <script setup>
-import {signOut} from "firebase/auth"
 import {computed, onMounted, ref} from "vue";
-import router from "@/router/router";
 import useUser from "@/composable/useUser";
 import MaSelectCountry from "@/components/UI/MaSelectCountry.vue";
 import MaToast from "@/components/UI/MaToast.vue";
@@ -37,10 +35,6 @@ const isVerification = ref(false)
 const country = ref('')
 const sex = ref('')
 const dateOfBirth = ref('')
-const userSignOut = () => {
-    signOut(auth)
-    router.push('/')
-}
 
 const errorNewPassword = ref('')
 const errorConfirmPassword = ref('')
@@ -234,10 +228,7 @@ onMounted(async () => {
                 <span  class="help">If you do not need to change the password, leave the field blank.</span>
 
             </div>
-            <div class="group__btn">
-                <ma-button @click="userSignOut">SignOut</ma-button>
                 <ma-button @click="handleButtonClick" :disabled="isButtonClicked" :isDisabled="isButtonClicked">Save</ma-button>
-            </div>
         </form>
     </div>
     <MaToast :type="typeToast" :message="toastMessage" v-if="showToastMessage" @close="showToastMessage = false"/>
