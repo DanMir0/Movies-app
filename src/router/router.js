@@ -1,26 +1,67 @@
 import {createRouter, createWebHistory} from 'vue-router';
 import SearchPage from "@/pages/SearchPage.vue";
-import FilterPage from "@/pages/FilterPage.vue";
 import DetailsMoviePage from "@/pages/DetailsMoviePage.vue";
+import LoginPage from "@/pages/LoginPage.vue";
+import MaNavbar from "@/components/UI/MaNavbar.vue";
+import FilterPage from "@/pages/FilterPage.vue";
+import RegistrationPage from "@/pages/RegistrationPage.vue";
+import ResetPassPage from "@/pages/ResetPassPage.vue";
+import ProfilePage from "@/pages/ProfilePage.vue";
+import useUser from "@/composable/useUser";
+import NotFound from "@/pages/NotFound.vue";
+
+const {getCurrentUser} = useUser()
 
 const routes = [
     {
-        path: '/filter',
-        name: 'FilterPage',
-        component: FilterPage,
-        alias: '/'
+        path: '/:pathMatch(.*)',
+        name: 'NotFound',
+        component: NotFound
     },
     {
-        path: '/search/',
-        name: 'SearchPage',
-        component: SearchPage,
-        props: true
+        path: '/sign-in',
+        name: 'LoginPage',
+        component: LoginPage,
     },
     {
-        path: '/movie/{:movie_id}',
-        name: 'movie-details',
-        component: DetailsMoviePage
-    }
+        path: '/',
+        component: MaNavbar,
+        children: [
+            {
+                path: '',
+                name: 'FilterPage',
+                component: FilterPage
+            },
+            {
+                path: '/search/',
+                name: 'SearchPage',
+                component: SearchPage,
+                props: true
+            },
+            {
+                path: '/:movie_id',
+                name: 'movie-details',
+                component: DetailsMoviePage,
+                props: true
+            },
+            {
+                path: '/profile',
+                name: 'ProfilePage',
+                component: ProfilePage,
+                meta: {requiresAuth: true}
+            },
+        ]
+    },
+    {
+        path: '/sign-up',
+        name: 'RegistrationPage',
+        component: RegistrationPage,
+    },
+    {
+        path: '/reset-password',
+        name: 'ResetPasswordPage',
+        component: ResetPassPage,
+    },
 
 ]
 
@@ -29,4 +70,16 @@ const router = createRouter({
     history: createWebHistory(process.env.BASE_URL)
 })
 
+router.beforeEach(async (to,from, next) => {
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+     const user = await getCurrentUser();
+        if (user) {
+         next()
+     } else {
+         next({name: 'LoginPage'})
+     }
+    } else {
+        next()
+    }
+})
 export default router

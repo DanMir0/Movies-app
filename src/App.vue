@@ -1,13 +1,8 @@
 <script setup>
-import MaNavbar from "@/components/UI/MaNavbar.vue";
 </script>
 
 <template>
-    <ma-navbar class="navbar"></ma-navbar>
-    <div class="container">
         <router-view></router-view>
-    </div>
-
 </template>
 
 <style>
@@ -17,16 +12,14 @@ import MaNavbar from "@/components/UI/MaNavbar.vue";
     box-sizing: border-box;
     background-color: #0f0f0f;
     color: #FFFFFF;
+    text-decoration: none;
 }
 
-.container {
-    margin: 0 auto;
-    width: 100%;
-    max-width: 1200px;
+a {
+    text-decoration: underline;
 }
 
-.navbar {
-    border-bottom: 1px solid #424242;
-    margin-bottom: 30px;
+a:hover {
+    color: #b8860b;
 }
 </style>

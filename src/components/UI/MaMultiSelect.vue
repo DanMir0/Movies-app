@@ -1,6 +1,5 @@
 <script setup>
 import {ref} from "vue";
-import {AkChevronDown, LiCross} from "@kalimahapps/vue-icons";
 
 const props = defineProps({
     genres: {
@@ -53,11 +52,28 @@ const toggleOptions = () => {
                     :key="index"
                 >
                     <span>{{ genre.name }}</span>
-                    <LiCross @click="removeGenre(genre)"></LiCross>
+                    <span @click="removeGenre(genre)">
+                         <svg fill="#ffffff" width="15px" height="15px" viewBox="-3.5 0 19 19"
+                              xmlns="http://www.w3.org/2000/svg"
+                              class="cf-icon-svg">
+                        <path
+                            d="M11.383 13.644A1.03 1.03 0 0 1 9.928 15.1L6 11.172 2.072 15.1a1.03 1.03 0 1 1-1.455-1.456l3.928-3.928L.617 5.79a1.03 1.03 0 1 1 1.455-1.456L6 8.261l3.928-3.928a1.03 1.03 0 0 1 1.455 1.456L7.455 9.716z"/>
+                    </svg>
+                    </span>
                 </div>
             </div>
             <span @click="toggleOptions" class="arrow">
-            <AkChevronDown></AkChevronDown>
+                <svg fill="#ffffff" height="15px" width="15px" version="1.1" id="Layer_1"
+                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                     viewBox="0 0 511.787 511.787" xml:space="preserve">
+                <g>
+                    <g>
+                        <path d="M508.667,125.707c-4.16-4.16-10.88-4.16-15.04,0L255.76,363.573L18,125.707c-4.267-4.053-10.987-3.947-15.04,0.213
+                            c-3.947,4.16-3.947,10.667,0,14.827L248.293,386.08c4.16,4.16,10.88,4.16,15.04,0l245.333-245.333
+                            C512.827,136.693,512.827,129.867,508.667,125.707z"/>
+                    </g>
+                </g>
+                </svg>
         </span>
         </div>
         <div class="options" v-if="showOptions">

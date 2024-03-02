@@ -21,7 +21,6 @@ const selectedSort = ref('popularity.desc')
 const selectedGenres = ref([])
 
 const rating = ref()
-const rangeLabels = Array.from({length: 10}, (_, i) => i);
 
 const page = ref(1)
 const totalPages = ref(1)
@@ -73,8 +72,8 @@ watch([selectedYear, rating, selectedSort], () => {
 </script>
 
 <template>
-    <div class="filter-page">
-        <div class="menu">
+    <main class="filter-page">
+        <section class="menu">
             <select class="select__solo" v-model="selectedYear">
                 <option class="option__solo" disabled value="">Year...</option>
                 <option
@@ -112,12 +111,12 @@ watch([selectedYear, rating, selectedSort], () => {
                     {{ option.name }}
                 </option>
             </select>
-        </div>
-        <div>
+        </section>
+        <section>
             <movies-list :movies="movies"></movies-list>
-        </div>
+        </section>
         <ma-pagination :page="page" :total-pages="totalPages" @change="changePage"></ma-pagination>
-    </div>
+    </main>
 </template>
 
 <style scoped>
