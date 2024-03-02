@@ -76,6 +76,10 @@ onUnmounted(() => {
                         <router-link :to="{name: 'ProfilePage'}">Profile</router-link>
                     </li>
                     <li class="dropdown__list">
+                        <img class="dropdown__icon" src="@/icons/favorite.svg">
+                        <router-link :to="{name: 'FavoritesPage'}">Favorites</router-link>
+                    </li>
+                    <li class="dropdown__list">
                         <img class="dropdown__icon" src="@/icons/exit.svg">
                         <router-link @click="userSignOut" to="/">Sign Out</router-link>
                     </li>

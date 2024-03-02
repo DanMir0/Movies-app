@@ -9,6 +9,7 @@ import ResetPassPage from "@/pages/ResetPassPage.vue";
 import ProfilePage from "@/pages/ProfilePage.vue";
 import useUser from "@/composable/useUser";
 import NotFound from "@/pages/NotFound.vue";
+import FavoritesPage from "@/pages/FavoritesPage.vue";
 
 const {getCurrentUser} = useUser()
 
@@ -48,6 +49,12 @@ const routes = [
                 path: '/profile',
                 name: 'ProfilePage',
                 component: ProfilePage,
+                meta: {requiresAuth: true}
+            },
+            {
+                path: '/favorites',
+                name: 'FavoritesPage',
+                component: FavoritesPage,
                 meta: {requiresAuth: true}
             },
         ]
