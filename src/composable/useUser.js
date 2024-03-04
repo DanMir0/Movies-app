@@ -46,6 +46,7 @@ export default function useUser() {
                                 user.value.country = docSnap.data().country
                                 user.value.sex = docSnap.data().sex
                                 user.value.dateOfBirth = docSnap.data().dateOfBirth
+                                user.value.favorites = docSnap.data().favorites
                             }
 
                         } else {
@@ -148,6 +149,27 @@ export default function useUser() {
         }
     }
 
+    const addFavorite = async (movie) => {
+        try {
+            const userDocRef = doc(db, "users", user.value.uid)
+            const userDocSnap = await getDoc(userDocRef);
+            const userData = userDocSnap.data()
+
+            if (userData.favorites && userData.favorites.some(favMovie => favMovie.id === movie.id)) {
+                await updateDoc(userDocRef, {
+                    favorites: userData.favorites.filter(favMovie => favMovie.id !== movie.id)
+                })
+            } else {
+                movie.isFavorite = true
+                await updateDoc(userDocRef, {
+                    favorites: [...userData.favorites, movie]
+                })
+            }
+        } catch (e) {
+            throw 'sorry, try later'
+        }
+    }
+
     watch(user, async () => {
         await getCurrentUser();
     });
@@ -160,7 +182,7 @@ export default function useUser() {
         resetPassword,
         user,
         savePassword,
-        checkUsernameExists,
-        saveInfoUser
+        saveInfoUser,
+        addFavorite
     }
 }
