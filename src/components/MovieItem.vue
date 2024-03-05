@@ -25,6 +25,7 @@ const onAddFavorite = () => {
         addFavorite(props.movie)
     } catch (e) {
         showToast(e.message, 'error')
+        throw e
     }
 }
 const voteAverage = computed(() => {
@@ -46,13 +47,15 @@ const {getGenresFromMovie} = useMoviesGenres()
         <div class="movie__logo">
             <router-link :to="{name: 'movie-details', params: {movie_id: movie.id}}" class="link__movie">
                 <img
-                    @mousemove="showFavoriteIcon = true"
-                    @mouseout="showFavoriteIcon = false"
+
                     :src="getMoviePosterUrl(movie.poster_path)"
                     :alt="movie.title">
             </router-link>
-            <img @click="onAddFavorite" @mousemove="showFavoriteIcon = true" @mouseout="showFavoriteIcon = false"
-                 v-show="showFavoriteIcon" class="icon__favorite">
+            <img @click="onAddFavorite"
+                 src="@/icons/favorite.svg"
+                 class="icon-favorite"
+                :class="{'icon-favorite--active': movie.isFavorite}"
+            >
         </div>
         <div class="movie__info">
             <div>
@@ -157,17 +160,27 @@ const {getGenresFromMovie} = useMoviesGenres()
 }
 
 .movie__logo {
+
     position: relative;
+    &:hover{
+        .icon-favorite{
+            display: block;
+        }
+    }
 }
 
-.icon__favorite {
+.icon-favorite {
+    top: 0;
+    display: none;
     position: absolute;
     right: -1px;
     width: 30px;
     background: transparent;
+    cursor: pointer;
 }
 
-.icon__favorite:hover {
-    cursor: pointer;
+.icon-favorite--active{
+    display: block;
+  //background-image: url("");
 }
 </style>

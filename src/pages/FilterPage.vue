@@ -1,11 +1,12 @@
 <script setup>
 import axios from "axios";
-import {onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import MoviesList from "@/components/MoviesList.vue";
 import useMoviesGenres from "@/composable/useMoviesGenres";
+import useUser from "@/composable/useUser";
 
-const movies = ref([])
-
+const moviesOrigin = ref([])
+const {user} = useUser()
 const selectedYear = ref('')
 
 const sortOptions = ref([
@@ -38,9 +39,22 @@ const filterMovies = async () => {
             'page': page.value
         }
     })
-    movies.value = response.data.results
+    moviesOrigin.value = response.data.results
+
     totalPages.value = response.data.total_pages
 }
+
+const movies = computed(() => {
+      return  moviesOrigin.value.map(movie => {
+          if (user.value.uid && user.value.favorites) {
+              movie.isFavorite = !!user.value.favorites.includes(movie.id);
+          } else {
+              movie.isFavorite = false
+          }
+          return movie
+      })
+})
+
 
 const genreChange = (idGenre) => {
     if (selectedGenres.value.includes(idGenre)) {

@@ -27,7 +27,6 @@ const user = ref({
 export default function useUser() {
     const auth = getAuth();
 
-
     const getCurrentUser = async () => {
         if (user.value.uid) {
             return user.value
@@ -61,7 +60,7 @@ export default function useUser() {
     }
 
     const updateUsername = async (username) => {
-        try {
+
             let isThereUsername = await checkUsernameExists(username)
             if (isThereUsername) {
                 throw new Error('The user already exists with this username.')
@@ -76,9 +75,7 @@ export default function useUser() {
                 })
                 user.value.displayName = username
             }
-        } catch (e) {
-            throw e.message
-        }
+
     }
 
     const savePassword = async (currentPassword, password) => {
@@ -150,7 +147,7 @@ export default function useUser() {
     }
 
     const addFavorite = async (movie) => {
-        try {
+
             const userDocRef = doc(db, "users", user.value.uid)
             const userDocSnap = await getDoc(userDocRef);
             const userData = userDocSnap.data()
@@ -160,14 +157,12 @@ export default function useUser() {
                     favorites: userData.favorites.filter(favMovie => favMovie.id !== movie.id)
                 })
             } else {
-                movie.isFavorite = true
-                await updateDoc(userDocRef, {
-                    favorites: [...userData.favorites, movie]
+                umovie.isFavorite = true
+                await pdateDoc(userDocRef, {
+                    favorites: [...userData.favorites, movie.id]
                 })
             }
-        } catch (e) {
-            throw 'sorry, try later'
-        }
+
     }
 
     watch(user, async () => {
