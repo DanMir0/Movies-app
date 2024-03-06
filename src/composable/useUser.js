@@ -6,11 +6,11 @@ import {
     EmailAuthProvider,
     sendPasswordResetEmail,
     reauthenticateWithCredential,
-    updatePassword,
+    updatePassword, createUserWithEmailAndPassword,
 } from "firebase/auth";
 
 import {db} from "@/confFirebase"
-import {doc, updateDoc, getDoc, where, getDocs, collection, query} from "firebase/firestore"
+import {doc, updateDoc,setDoc, getDoc, where, getDocs, collection, query} from "firebase/firestore"
 import {ref, watch} from "vue"
 
 let promiseUser = null;
@@ -61,20 +61,20 @@ export default function useUser() {
 
     const updateUsername = async (username) => {
 
-            let isThereUsername = await checkUsernameExists(username)
-            if (isThereUsername) {
-                throw new Error('The user already exists with this username.')
-            } else {
-                const currentUser = auth.currentUser
-                const userDocRef = doc(db, "users", currentUser.uid)
-                await updateProfile(currentUser, {
-                    displayName: username
-                })
-                await updateDoc(userDocRef, {
-                    username: username
-                })
-                user.value.displayName = username
-            }
+        let isThereUsername = await checkUsernameExists(username)
+        if (isThereUsername) {
+            throw new Error('The user already exists with this username.')
+        } else {
+            const currentUser = auth.currentUser
+            const userDocRef = doc(db, "users", currentUser.uid)
+            await updateProfile(currentUser, {
+                displayName: username
+            })
+            await updateDoc(userDocRef, {
+                username: username
+            })
+            user.value.displayName = username
+        }
 
     }
 
@@ -148,21 +148,45 @@ export default function useUser() {
 
     const addFavorite = async (movie) => {
 
-            const userDocRef = doc(db, "users", user.value.uid)
-            const userDocSnap = await getDoc(userDocRef);
-            const userData = userDocSnap.data()
+        const userDocRef = doc(db, "users", user.value.uid)
+        const userDocSnap = await getDoc(userDocRef);
+        const userData = userDocSnap.data()
 
-            if (userData.favorites && userData.favorites.some(favMovie => favMovie.id === movie.id)) {
-                await updateDoc(userDocRef, {
-                    favorites: userData.favorites.filter(favMovie => favMovie.id !== movie.id)
-                })
+        if (userData.favorites && userData.favorites.some(favMovie => favMovie.id === movie.id)) {
+            await updateDoc(userDocRef, {
+                favorites: userData.favorites.filter(favMovie => favMovie.id !== movie.id)
+            })
+        } else {
+            umovie.isFavorite = true
+            await pdateDoc(userDocRef, {
+                favorites: [...userData.favorites, movie.id]
+            })
+        }
+
+    }
+
+    const saveUserInDb = async (email, userId) => {
+        await setDoc(doc(db, "users", userId), {
+            email: email
+        })
+    }
+
+    const signUp = async (email, password) => {
+        try {
+           let newUser =  await createUserWithEmailAndPassword(auth, email, password)
+            console.log(newUser.user.uid)
+            await saveUserInDb(email, newUser.user.uid)
+        } catch (error) {
+            if (error.code === 'auth/weak-password') {
+                throw 'Password should be at least 6 characters.'
+            } else if (error.code === 'auth/missing password') {
+                throw 'Enter a password.'
+            } else if (error.code === 'auth/invalid-email') {
+                throw 'Email must contain an \'@\' and a domain. For example \'example@tv.tv\''
             } else {
-                umovie.isFavorite = true
-                await pdateDoc(userDocRef, {
-                    favorites: [...userData.favorites, movie.id]
-                })
+                throw error
             }
-
+        }
     }
 
     watch(user, async () => {
@@ -178,6 +202,7 @@ export default function useUser() {
         user,
         savePassword,
         saveInfoUser,
-        addFavorite
+        addFavorite,
+        signUp
     }
 }

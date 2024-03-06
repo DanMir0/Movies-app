@@ -3,6 +3,7 @@ import {ref} from "vue";
 import {createUserWithEmailAndPassword, getAuth} from "firebase/auth";
 import router from "@/router/router";
 import MaPasswordInput from "@/components/UI/MaPasswordInput.vue";
+import useUser from "@/composable/useUser";
 
 const email = ref('')
 const password = ref('')
@@ -11,32 +12,20 @@ const error = ref('')
 const isError = ref(false)
 const auth = getAuth()
 
+const {signUp} = useUser()
+
 const onSignUp = async () => {
     try {
         if (password.value !== confirmPassword.value) {
             isError.value = true
             error.value = 'The passwords don\'t match.'
         } else {
-            await createUserWithEmailAndPassword(auth, email.value, password.value,)
+           await signUp(email.value, password.value)
             await router.push({name: 'FilterPage'})
         }
     } catch (e) {
         isError.value = true
-        if (e.code) {
-            if (e.code === 'auth/weak-password') {
-                error.value = 'Password should be at least 6 characters.'
-            } else if (e.code === 'auth/missing password') {
-                error.value = 'Enter a password.'
-            } else if (e.code === 'auth/invalid-email') {
-                error.value = 'Email must contain an \'@\' and a domain. For example \'example@tv.tv\''
-            } else {
-                error.value = 'An unexpected error occurred. Please try again.'
-                console.error(e)
-            }
-        } else {
-            error.value = 'An unexpected error occurred. Please try again.'
-            console.error(e)
-        }
+        error.value = e.message
     }
 }
 </script>
