@@ -26,4 +26,10 @@ form {
 .form__error {
     border: 1px solid #ff0000;
 }
+@media screen and (max-width: 1024px) {
+    form {
+        max-width: 300px;
+        padding: 30px 20px;
+    }
+}
 </style>

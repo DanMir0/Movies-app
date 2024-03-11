@@ -88,4 +88,9 @@ const login = async () => {
 .error {
     color: #ff0000;
 }
+@media screen and (max-width: 1024px) {
+    .forgot-pass {
+        margin-left: 130px;
+    }
+}
 </style>
