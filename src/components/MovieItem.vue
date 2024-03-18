@@ -183,4 +183,23 @@ const {getGenresFromMovie} = useMoviesGenres()
     display: block;
   //background-image: url("");
 }
+
+@media screen and (max-width: 1024px){
+    .movie {
+        gap: 5px;
+    }
+    .movie__info {
+        gap: 6px;
+    }
+    .movie__overview {
+        width: 100%;
+        max-width: 370px;
+    }
+}
+@media screen and (max-width: 1024px){
+    .movie__overview {
+        width: 100%;
+        max-width: 300px;
+    }
+}
 </style>
