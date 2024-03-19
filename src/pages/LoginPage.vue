@@ -48,7 +48,7 @@ const login = async () => {
                 </div>
                 <div class="group__input">
                     <MaPasswordInput v-model="password"/>
-                    <router-link class="forgot-pass" :to="{name: 'ResetPasswordPage'}">Forgot password?</router-link>
+                    <router-link  class="forgot-pass" :to="{name: 'ResetPasswordPage'}">Forgot password?</router-link>
                 </div>
             </div>
             <p class="error" v-show="isError">{{ error }}</p>
@@ -91,6 +91,11 @@ const login = async () => {
 @media screen and (max-width: 1024px) {
     .forgot-pass {
         margin-left: 130px;
+    }
+}
+@media screen and (max-width: 375px) {
+    .forgot-pass {
+        margin-left: 115px;
     }
 }
 </style>
