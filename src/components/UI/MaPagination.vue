@@ -65,6 +65,7 @@ const displayedPages = computed(() => {
 <style scoped>
 .pagination {
     margin-top: 20px;
+    margin-bottom: 50px;
 }
 
 .page__wrapper {

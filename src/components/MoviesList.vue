@@ -56,9 +56,10 @@ h2 {
 
 @media screen and (max-width: 550px){
     .lists {
+        margin-top: 10px;
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 5px;
     }
 }
 </style>
