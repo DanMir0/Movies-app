@@ -32,4 +32,12 @@ form {
         padding: 30px 20px;
     }
 }
+@media screen and (max-width: 375px) {
+    form {
+        margin-left: 33px;
+        margin-right: 33px;
+        max-width: 300px;
+        padding: 30px 20px;
+    }
+}
 </style>
