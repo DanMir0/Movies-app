@@ -63,6 +63,11 @@ const displayedPages = computed(() => {
 </template>
 
 <style scoped>
+.pagination {
+    margin-top: 20px;
+    margin-bottom: 50px;
+}
+
 .page__wrapper {
     list-style: none;
     display: flex;
@@ -83,5 +88,11 @@ const displayedPages = computed(() => {
 
 a {
     text-decoration: none;
+}
+
+@media screen and (max-width: 1024px) {
+    .pagination {
+        margin-top: 10px;
+    }
 }
 </style>

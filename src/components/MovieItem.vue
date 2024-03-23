@@ -43,7 +43,7 @@ const {getGenresFromMovie} = useMoviesGenres()
 </script>
 
 <template>
-    <div class="movie">
+    <article class="movie">
         <div class="movie__logo">
             <router-link :to="{name: 'movie-details', params: {movie_id: movie.id}}" class="link__movie">
                 <img
@@ -93,7 +93,7 @@ const {getGenresFromMovie} = useMoviesGenres()
             </ul>
             <p class="movie__overview">{{ movie.overview }}</p>
         </div>
-    </div>
+    </article>
     <MaToast :type="typeToast" :message="toastMessage" v-if="showToastMessage" @close="showToastMessage = false"/>
 </template>
 
@@ -103,6 +103,7 @@ const {getGenresFromMovie} = useMoviesGenres()
     flex-direction: column;
     align-items: center;
     gap: 10px;
+    padding: 15px;
 }
 
 .movie__info {
@@ -182,5 +183,24 @@ const {getGenresFromMovie} = useMoviesGenres()
 .icon-favorite--active{
     display: block;
   //background-image: url("");
+}
+
+@media screen and (max-width: 1024px){
+    .movie {
+        gap: 5px;
+    }
+    .movie__info {
+        gap: 6px;
+    }
+    .movie__overview {
+        width: 100%;
+        max-width: 370px;
+    }
+}
+@media screen and (max-width: 1024px){
+    .movie__overview {
+        width: 100%;
+        max-width: 300px;
+    }
 }
 </style>

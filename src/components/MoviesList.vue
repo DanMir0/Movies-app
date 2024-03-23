@@ -45,4 +45,21 @@ h2 {
     border: 1px solid #424242;
     border-radius: 7px;
 }
+
+@media screen and (max-width: 1024px) {
+    .lists {
+        gap: 15px;
+        margin-top: 25px;
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media screen and (max-width: 550px){
+    .lists {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+}
 </style>

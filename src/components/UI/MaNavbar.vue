@@ -2,6 +2,7 @@
 import {onMounted, onUnmounted, ref} from "vue";
 import useUser from "@/composable/useUser";
 import {signOut} from "firebase/auth";
+import router from "@/router/router";
 
 const searchQuery = ref('')
 const {getCurrentUser, auth, user} = useUser()
@@ -12,6 +13,7 @@ onMounted(async () => {
 
 const userSignOut = () => {
     signOut(auth)
+    showBurger.value = false
 }
 
 const showDropdown = ref(false)
@@ -36,40 +38,99 @@ onMounted(() => {
 onUnmounted(() => {
     document.removeEventListener('click', handleClickOutside);
 });
+
+const showBurger = ref(false)
+const searchExpanded = ref(false)
+
+const expandSearch = () => {
+    searchExpanded.value = !searchExpanded.value
+    if (!searchExpanded.value) {
+        searchQuery.value = ''
+    }
+}
 </script>
 
 <template>
-    <header class="navbar" >
+    <header class="navbar">
         <router-link :to="{name: 'FilterPage'}" class="logo link">
-            <img class="logo__img" src="@/icons/logo.svg">
+            <img class="logo__img" src="@/icons/logo.svg" alt="logo">
             <div>
                 <h1 class="allison-regular">CineSphere</h1>
                 <hr>
                 <h2>Watch for Free</h2>
             </div>
         </router-link>
-        <div class="menu">
-            <router-link class="link" :to="{name: 'FilterPage'}">Movies</router-link>
+                <div class="menu">
+                    <router-link class="link" :to="{name: 'FilterPage'}">Movies</router-link>
+                </div>
+        <div class="mobile" :style="{position: searchExpanded ? 'absolute': 'relative', width: searchExpanded ? '100%' : '20%'}">
+            <div class="search">
+                <span class="search__icon search__icon-back" @click="searchExpanded = false"
+                      :class="{'search__icon--active': searchExpanded}"
+                      :style="{display: searchExpanded ? 'block' : 'none'}"></span>
+                <ma-input
+                    v-show="searchExpanded"
+                    class="search__input"
+                    :class="{'search__input--active': searchExpanded}"
+                    v-model="searchQuery"
+                    @keyup.enter="$emit('update:searchQuery', $event.target.value)"
+                    @keydown.enter="router.push({ name: 'SearchPage', query: { q: searchQuery } })"
+                    placeholder="Search..."
+                />
+                <span class="search__icon"
+                      :class="{'search__icon--active': searchExpanded}"
+                      :style="{ right: searchExpanded ? '45px' : '4px', display: showBurger ? 'none' : 'block' }"
+                      @click="expandSearch"></span>
+            </div>
+            <div class="hamburger"
+            :style="{display: searchExpanded ? 'none' : 'block'}">
+                <div class="hamburger__icon" @click="showBurger = !showBurger"
+                     :class="{'hamburger--active': showBurger === true, 'hamburger--no-active': showBurger === false}"
+                     :style="{'z-index': showBurger ? 10 : 2}"
+                ></div>
+                <div v-show="showBurger" class="hamburger__content">
+                    <ul class="hamburger__lists">
+                        <li class="hamburger__item">
+                            <span class="link__icon link__icon-movies"></span>
+                            <router-link @click="showBurger = false" :to="{name: 'FilterPage'}">Movies</router-link>
+                        </li>
+                        <li v-if="user.uid" class="hamburger__item">
+                            <span class="link__icon link__icon-profile"></span>
+                            <router-link @click="showBurger = false" :to="{name: 'ProfilePage'}">Profile</router-link>
+                        </li>
+                        <li v-if="user.uid" class="hamburger__item">
+                            <span class="link__icon link__icon-favorite"></span>
+                            <router-link @click="showBurger = false" :to="{name: 'FavoritesPage'}">Favorites
+                            </router-link>
+                        </li>
+                        <li v-if="user.uid" class="dropdown__list">
+                            <span class="link__icon link__icon-exit"></span>
+                            <router-link @click="userSignOut" to="/">Sign Out</router-link>
+                        </li>
+                    </ul>
+                    <div class="block__entry" v-if="!user.uid">
+                        <router-link class="link" :to="{name: 'LoginPage'}">Sign In</router-link>
+                        <router-link class="link" :to="{name: 'RegistrationPage'}">Sign Up</router-link>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="block__search">
-            <ma-input
-                class="search"
-                v-model="searchQuery"
-                @keyup.enter="$emit('update:searchQuery', $event.target.value)"
-                @keydown.enter="router.push({ name: 'SearchPage', query: { q: searchQuery } })"
-                placeholder="Search..."
-            />
-            <span class="search-icon">
-                <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M15.7955 15.8111L21 21M18 10.5C18 14.6421 14.6421 18 10.5 18C6.35786 18 3 14.6421 3 10.5C3 6.35786 6.35786 3 10.5 3C14.6421 3 18 6.35786 18 10.5Z"
-                    stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </span>
+        <div class="tablet">
+            <div class="search">
+                <ma-input
+                    class="search__input"
+                    v-model="searchQuery"
+                    @keyup.enter="$emit('update:searchQuery', $event.target.value)"
+                    @keydown.enter="router.push({ name: 'SearchPage', query: { q: searchQuery } })"
+                    placeholder="Search..."
+                />
+                <span class="search__icon"
+                      @click="expandSearch"></span>
+            </div>
         </div>
-        <div v-if="user.uid" class="dropdown__open">
+        <div v-if="user.uid" class="dropdown">
             <p @click="toggleDropdown">profile</p>
-            <div v-show="showDropdown" class="dropdown">
+            <div v-show="showDropdown" class="dropdown__open">
                 <ul class="dropdown__lists">
                     <li class="dropdown__list">
                         <img class="dropdown__icon" src="@/icons/profile.svg">
@@ -86,15 +147,14 @@ onUnmounted(() => {
                 </ul>
             </div>
         </div>
-        <div class="block__entry" v-else>
+        <div class="block__entry block__entry--desk" v-else>
             <router-link class="link" :to="{name: 'LoginPage'}">Sign In</router-link>
             <router-link class="link" :to="{name: 'RegistrationPage'}">Sign Up</router-link>
         </div>
-
     </header>
-    <ma-container>
-        <router-view></router-view>
-    </ma-container>
+        <ma-container>
+            <router-view></router-view>
+        </ma-container>
 </template>
 
 <style scoped>
@@ -109,6 +169,10 @@ onUnmounted(() => {
     gap: 15px;
 }
 
+.tablet {
+    max-width: 420px;
+    width: 100%;
+}
 .logo {
     display: flex;
     align-items: center;
@@ -154,18 +218,21 @@ hr {
     color: #b8860b;
 }
 
-.block__search {
-    max-width: 360px;
+.search {
+    max-width: 420px;
     width: 100%;
     position: relative;
 }
 
-.search {
+.search__input {
     width: 100%;
     padding-right: 30px;
 }
 
-.search-icon {
+.search__icon {
+    background-image: url("/src/icons/search.svg");
+    width: 25px;
+    height: 25px;
     position: absolute;
     top: 52%;
     right: 15px;
@@ -194,11 +261,11 @@ hr {
     opacity: 0.8;
 }
 
-.dropdown__open {
+.dropdown {
     position: relative;
 }
 
-.dropdown {
+.dropdown__open {
     width: 120px;
     right: 0;
     position: absolute;
@@ -219,9 +286,216 @@ hr {
 .dropdown__icon {
     width: 20px;
 }
+
 .dropdown__list {
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+.mobile {
+    display: none;
+}
+
+@media screen and (max-width: 1024px) {
+    .mobile {
+        display: none;
+    }
+
+    .tablet {
+        max-width: 300px;
+        width: 100%;
+    }
+
+    .search {
+        max-width: 100%;
+    }
+
+    .navbar {
+        padding: 10px;
+        margin-bottom: 20px;
+        gap: 5px;
+    }
+
+    .logo__img {
+        width: 80px;
+    }
+
+    h1 {
+        font-size: 40px;
+    }
+
+    h2 {
+        font-size: 18px;
+    }
+
+    .menu a {
+        font-size: 18px;
+    }
+
+    .hamburger {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 770px) {
+    .mobile {
+        display: flex;
+    }
+
+    .tablet {
+        display: none;
+    }
+
+    .menu {
+        display: none;
+    }
+
+    .navbar {
+        position: relative;
+    }
+
+    .dropdown {
+        display: none;
+    }
+
+    .logo__img {
+        width: 60px;
+    }
+
+    h1 {
+        font-size: 25px;
+    }
+
+    h2 {
+        font-size: 15px;
+    }
+
+    .hamburger {
+        display: block;
+        position: relative;
+    }
+
+    .hamburger__icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    .hamburger--no-active {
+        background-image: url("/src/icons/menu.svg");
+    }
+
+    .hamburger--active {
+        left: -30px;
+        background-color: transparent;
+        position: absolute;
+        z-index: 3;
+        background-image: url("/src/icons/close.svg");
+    }
+
+    .hamburger__content {
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        z-index: 7;
+        flex-direction: column; /* Добавлено */
+        justify-content: center; /* Добавлено */
+        align-items: center; /* Добавлено */
+    }
+
+    .hamburger__lists {
+        list-style: none;
+        display: flex;
+        gap: 10px;
+        flex-direction: column;
+    }
+
+    .hamburger__item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .hamburger__item:active {
+        color: #b8860b;
+    }
+
+    .link {
+        background-color: transparent;
+    }
+
+    .link__icon {
+        display: inline-block;
+        background-size: cover;
+        background-repeat: no-repeat;
+        width: 20px;
+        height: 20px;
+    }
+
+    .link__icon-movies {
+        background-image: url("/src/icons/movies.svg");
+    }
+
+    .link__icon-profile {
+        background-image: url("/src/icons/profile.svg");
+    }
+
+    .link__icon-favorite {
+        background-image: url("/src/icons/favorite.svg");
+    }
+
+    .link__icon-exit {
+        background-image: url("/src/icons/exit.svg");
+    }
+
+    .block__entry {
+        margin-top: 10px;
+        flex-direction: column;
+    }
+
+    .block__entry--desk {
+        display: none;
+    }
+
+    .search {
+        display: block;
+        z-index: 5;
+    }
+
+    .search__icon {
+        top: 15px;
+        right: 4px;
+        transition: right 0.3s ease;
+        pointer-events: fill;
+    }
+
+    .search__icon--active {
+        top: 24px;
+    }
+
+    .search__icon-back {
+
+        left: 10px;
+        background-image: url("/src/icons/arrow-back.svg");
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    .search__input {
+        width: 0;
+        padding-right: 0;
+        opacity: 0;
+        transition: width 0.3s ease, opacity 0.3s ease, padding-right 0.3s ease;
+    }
+
+    .search__input--active {
+        width: 95%;
+        padding-right: 30px;
+        padding-left: 40px;
+        opacity: 1;
+    }
 }
 </style>
