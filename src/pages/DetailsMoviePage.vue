@@ -66,15 +66,15 @@ watchEffect(async () => {
             <img :src="getMoviePosterUrl(movie.poster_path)" :alt="movie.title">
             <div class="poster__group">
                 <div class="poster__info">
-                    <img src="../icons/imdb.svg" alt="Vote average">
+                    <span class="movie__icon movie__icon-imdb"></span>
                     <b>{{ movieVoteAverage }}</b>
                 </div>
                 <div class="poster__info">
-                    <img src="../icons/like.svg" alt="Vote average">
+                    <span class="movie__icon movie__icon-like"></span>
                     <b>{{ movie.vote_count }}</b>
                 </div>
                 <div class="poster__info">
-                    <img src="../icons/eye.svg" alt="Vote average">
+                    <span class="movie__icon movie__icon-eye"></span>
                     <b>{{ moviePopularity }}</b>
                 </div>
             </div>
@@ -176,142 +176,34 @@ a:hover {
     color: #b8860b;
 }
 
+.movie__icon {
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 25px;
+    height: 25px;
+}
 
+.movie__icon-imdb {
+    background-image: url("/src/icons/imdb.svg");
+}
+
+.movie__icon-like {
+    background-image: url("/src/icons/like.svg");
+}
+
+.movie__icon-eye {
+    background-image: url("/src/icons/eye.svg");
+}
+
+@media screen and (max-width: 670px) {
+    .movie {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .movie__info-items {
+        align-items: center;
+    }
+}
 </style>
-
-<!--.movie__page {-->
-<!--margin: 0 20px;-->
-<!--}-->
-
-<!--.movie {-->
-<!--margin-top: 20px;-->
-<!--display: flex;-->
-<!--}-->
-
-<!--.movie a:hover {-->
-<!--cursor: pointer;-->
-<!--opacity: 0.5;-->
-<!--transition: all 1s ease-out;-->
-<!--}-->
-
-<!--.movie__description {-->
-<!--margin-left: 15px;-->
-<!--}-->
-
-<!--.movie__items {-->
-<!--margin: 20px 0;-->
-<!--display: flex;-->
-<!--flex-direction: row;-->
-<!--}-->
-
-<!--.group__item {-->
-<!--display: flex;-->
-<!--flex-direction: row;-->
-<!--}-->
-
-<!--.movie__items-value {-->
-<!--margin-left: 20px;-->
-<!--display: flex;-->
-<!--flex-direction: column;-->
-<!--gap: 10px;-->
-<!--}-->
-
-<!--.movie__items-name {-->
-<!--display: flex;-->
-<!--flex-direction: column;-->
-<!--gap: 10px;-->
-<!--}-->
-
-<!--.movie__grades {-->
-<!--display: flex;-->
-<!--justify-content: space-around;-->
-<!--}-->
-
-<!--.group__grades {-->
-<!--display: flex;-->
-<!--flex-direction: column;-->
-<!--align-items: center;-->
-<!--gap: 5px;-->
-<!--}-->
-
-<!--.comments__container {-->
-<!--margin-top: 50px;-->
-<!--}-->
-
-<!--.comments__add {-->
-<!--display: flex;-->
-<!--flex-direction: column;-->
-<!--gap: 15px;-->
-<!--}-->
-
-<!--.input__add {-->
-<!--border: none;-->
-<!--border-bottom: 1px solid #424242;-->
-<!--border-radius: 0px;-->
-<!--}-->
-
-<!--.input__add:focus {-->
-<!--outline: none;-->
-<!--}-->
-
-<!--.btn__add {-->
-<!--padding: 0.5em 2em;-->
-<!--max-width: 100px;-->
-<!--width: 100%;-->
-<!--background-color: #303030;-->
-<!--border: none;-->
-<!--}-->
-
-<!--.btn__add:hover {-->
-<!--background-color: #3e3e3e;-->
-<!--cursor: pointer;-->
-<!--}-->
-
-<!--.comment {-->
-<!--display: flex;-->
-<!--flex-direction: row;-->
-<!--gap: 5px;-->
-<!--}-->
-
-<!--.comments {-->
-<!--margin-top: 30px;-->
-<!--display: flex;-->
-<!--flex-direction: column;-->
-<!--gap: 20px;-->
-<!--}-->
-
-<!--.btn__delete {-->
-<!--font-size: 16px;-->
-<!--border: none;-->
-<!--width: 50px;-->
-<!--color: #999999;-->
-<!--border-bottom: 1px dashed;-->
-<!--}-->
-
-<!--.btn__delete:hover {-->
-<!--cursor: pointer;-->
-<!--opacity: 0.8;-->
-<!--}-->
-
-<!--.comment__body {-->
-<!--display: flex;-->
-<!--flex-direction: column;-->
-<!--gap: 7px;-->
-<!--}-->
-
-<!--.comment__down {-->
-<!--display: flex;-->
-<!--flex-direction: column;-->
-<!--gap: 5px;-->
-<!--}-->
-
-<!--.comments__add-grades {-->
-<!--display: flex;-->
-<!--flex-direction: row;-->
-<!--justify-content: flex-start;-->
-<!--}-->
-
-<!--.comment__head {-->
-<!--display: flex;-->
-<!--gap: 15px;-->
-<!--}-->
