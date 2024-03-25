@@ -10,7 +10,7 @@ import {
 } from "firebase/auth";
 
 import {db} from "@/confFirebase"
-import {doc, updateDoc,setDoc, getDoc, where, getDocs, collection, query} from "firebase/firestore"
+import {doc, updateDoc, setDoc, getDoc, where, getDocs, collection, query} from "firebase/firestore"
 import {ref, watch} from "vue"
 
 let promiseUser = null;
@@ -152,17 +152,17 @@ export default function useUser() {
         const userDocSnap = await getDoc(userDocRef);
         const userData = userDocSnap.data()
 
-        if (userData.favorites && userData.favorites.some(favMovie => favMovie.id === movie.id)) {
+        if (userData.favorites.some(favMovie => favMovie === movie.id)) {
             await updateDoc(userDocRef, {
-                favorites: userData.favorites.filter(favMovie => favMovie.id !== movie.id)
+                favorites: userData.favorites.filter(favMovie => favMovie !== movie.id)
             })
+            movie.isFavorite = false
         } else {
-            umovie.isFavorite = true
-            await pdateDoc(userDocRef, {
+            movie.isFavorite = true
+            await updateDoc(userDocRef, {
                 favorites: [...userData.favorites, movie.id]
             })
         }
-
     }
 
     const saveUserInDb = async (email, userId) => {
@@ -173,7 +173,7 @@ export default function useUser() {
 
     const signUp = async (email, password) => {
         try {
-           let newUser =  await createUserWithEmailAndPassword(auth, email, password)
+            let newUser = await createUserWithEmailAndPassword(auth, email, password)
             console.log(newUser.user.uid)
             await saveUserInDb(email, newUser.user.uid)
         } catch (error) {

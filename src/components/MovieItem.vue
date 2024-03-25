@@ -47,15 +47,13 @@ const {getGenresFromMovie} = useMoviesGenres()
         <div class="movie__logo">
             <router-link :to="{name: 'movie-details', params: {movie_id: movie.id}}" class="link__movie">
                 <img
-
                     :src="getMoviePosterUrl(movie.poster_path)"
                     :alt="movie.title">
             </router-link>
-            <img @click="onAddFavorite"
-                 src="@/icons/favorite.svg"
+            <span @click="onAddFavorite"
                  class="icon-favorite"
-                :class="{'icon-favorite--active': movie.isFavorite}"
-            >
+                :class="{'icon-favorite--active': movie.isFavorite, 'icon-favorite--no-active': movie.isFavorite === false}"
+            ></span>
         </div>
         <div class="movie__info">
             <div>
@@ -171,18 +169,24 @@ const {getGenresFromMovie} = useMoviesGenres()
 }
 
 .icon-favorite {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-color: transparent;
     top: 0;
     display: none;
     position: absolute;
     right: -1px;
     width: 30px;
-    background: transparent;
+    height: 30px;
     cursor: pointer;
 }
 
+.icon-favorite--no-active{
+    background-image: url("/src/icons/favorite.svg");
+}
+
 .icon-favorite--active{
-    display: block;
-  //background-image: url("");
+    background-image: url("/src/icons/favorite-fill.svg");
 }
 
 @media screen and (max-width: 1024px){
