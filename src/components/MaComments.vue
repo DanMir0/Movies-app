@@ -34,7 +34,7 @@ function formatDate(timestamp) {
 <template>
     <div class="comments__container">
         <div class="comments__title">
-            <h3>{{comments.length}} comments</h3>
+            <h3>{{ comments.length }} comments</h3>
         </div>
         <MaCommentsAdd v-if="user.uid" :movieId="movieId"/>
         <div class="comments">
@@ -45,7 +45,9 @@ function formatDate(timestamp) {
                     <MaGrades :rating="comment.grade"/>
                 </div>
                 <p>{{ comment.comment }}</p>
-                <button v-if="comment.userId === user.uid" class="btn__delete" @click="deleteComment(comment.id)">Delete</button>
+                <button v-if="comment.userId === user.uid" class="btn__delete" @click="deleteComment(comment.id)">
+                    Delete
+                </button>
             </div>
         </div>
     </div>
@@ -100,5 +102,22 @@ function formatDate(timestamp) {
 .comment__date {
     font-size: 13px;
     color: #999999;
+}
+
+@media screen and (max-width: 670px) {
+    .comment {
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .comment__head {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .comment__date {
+        order: 2;
+    }
 }
 </style>
