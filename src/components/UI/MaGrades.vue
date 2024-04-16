@@ -61,4 +61,10 @@ const ratingWidthStyle = computed(() => {
 .star__colored {
     background: url('@/icons/star-fill.svg') center no-repeat;
 }
+
+@media screen and (max-width: 670px) {
+    .star-rating {
+        order: 1;
+    }
+}
 </style>
