@@ -4,15 +4,17 @@ import {computed, onMounted, ref, watch} from "vue";
 import MoviesList from "@/components/MoviesList.vue";
 import useMoviesGenres from "@/composable/useMoviesGenres";
 import useUser from "@/composable/useUser";
+import {useRoute} from "vue-router";
+import router from "@/router/router";
 
 const moviesOrigin = ref([])
 const {user} = useUser()
-const selectedYear = ref('')
 const showFilterDropdown = ref(false);
 const showNestedDropdownYear = ref(false);
 const showNestedDropdownGenres = ref(false)
 const showNestedDropdownRating = ref(false)
 const showSortDropdown = ref(false)
+const route = useRoute()
 
 const sortOptions = ref([
     {value: 'popularity.asc', name: 'Popularity asc'},
@@ -22,14 +24,15 @@ const sortOptions = ref([
     {value: 'vote_average.asc', name: 'Vote average asc'},
     {value: 'vote_average.desc', name: 'Vote average desc'},
 ])
-const selectedSort = ref('popularity.desc')
+const queryParams = ref({
+    page: 1,
+    sort: 'popularity.desc',
+    year: 2024,
+    genres: [],
+    startRating: 0,
+    endRating: 10,
+})
 
-const selectedGenres = ref([])
-
-const startRating = ref()
-const endRating = ref()
-
-const page = ref(1)
 const totalPages = ref(1)
 
 const {genres} = useMoviesGenres()
@@ -67,19 +70,20 @@ const toggleNestedDropdownRating = () => {
 };
 
 const onSelectedSort = (sort) => {
-    selectedSort.value = sort
+    queryParams.value.sort = sort
+    router.push({ query: queryParams.value})
 }
 
 const filterMovies = async () => {
     const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
         params: {
             api_key: '42b000d5a4c2a76ed3400dcd6cd491e0',
-            'primary_release_year': selectedYear.value,
-            'vote_average.gte': startRating.value,
-            'vote_average.lte': endRating.value = 10,
-            'with_genres': selectedGenres.value.join(','),
-            'sort_by': selectedSort.value,
-            'page': page.value
+            'primary_release_year': route.query.year || 2024,
+            'vote_average.gte': route.query.startRating || 0,
+            'vote_average.lte': route.query.endRating || 10,
+            'with_genres': route.query.genres || '',
+            'sort_by': route.query.sort || 'popularity.desc',
+            'page': route.query.page || 1
         }
     })
     moviesOrigin.value = response.data.results
@@ -100,29 +104,64 @@ const movies = computed(() => {
 
 
 const genreChange = (idGenre) => {
-    if (selectedGenres.value.includes(idGenre)) {
-        selectedGenres.value = selectedGenres.value.filter(id => id !== idGenre)
+    if (queryParams.value.genres.includes(idGenre)) {
+        queryParams.value.genres = queryParams.value.genres.filter(id => id !== idGenre)
     } else {
-        selectedGenres.value.push(idGenre)
+        queryParams.value.genres.push(idGenre)
     }
-    page.value = 1
+    queryParams.value.page = 1
+    router.push({ query: {...queryParams.value, genres: queryParams.value.genres.join(',')} });
     filterMovies()
 }
 
 function changePage(pageNumber) {
+    console.log(pageNumber)
     if (pageNumber !== '...') {
-        page.value = pageNumber
+        queryParams.value.page = pageNumber
+        router.push({ query: {page: pageNumber} });
     }
+    console.log(queryParams.value)
+}
+function yearChange(year) {
+    queryParams.value.year = year
+    router.push({ query: queryParams.value });
 }
 
-onMounted(filterMovies)
-
-watch(page, () => {
+function ratingChange() {
+    router.push({query: queryParams.value})
+}
+onMounted(() => {
     filterMovies()
 })
 
-watch([selectedYear, startRating, endRating, selectedSort], () => {
-    page.value = 1
+watch(() => route.query.page, () => {
+    router.push({query: {page: queryParams.value.page}})
+    filterMovies()
+})
+
+watch(() => queryParams.value.sort, () => {
+    queryParams.value.page = 1
+    router.push({ query: queryParams.value});
+
+    filterMovies()
+})
+watch(() => queryParams.value.year, () => {
+    queryParams.value.page = 1
+    router.push({ query: queryParams.value})
+    filterMovies()
+})
+watch(() => route.query.genres, () => {
+    router.push({ query: {...queryParams.value, genres: queryParams.value.genres.join(',')}})
+    filterMovies()
+})
+watch(() => queryParams.value.startRating, () => {
+    queryParams.value.page = 1
+    router.push({ query: queryParams.value})
+    filterMovies()
+})
+watch(() => queryParams.value.endRating, () => {
+    queryParams.value.page = 1
+    router.push({ query: queryParams.value})
     filterMovies()
 })
 </script>
@@ -162,7 +201,7 @@ watch([selectedYear, startRating, endRating, selectedSort], () => {
                             <h4 class="transparent">Year</h4>
                         </li>
                         <li v-for="year in 24" :key="year" class="dropdown__nested-item">
-                            <input type="radio" :id="'year-'+ year" :value="2000 + year" v-model="selectedYear">
+                            <input type="radio" :id="'year-'+ year" :value="2000 + year" v-model="queryParams.year"  @click="yearChange(2000 + year)">
                             <p class="transparent">{{ 2000 + year }}</p>
                         </li>
                     </ul>
@@ -175,7 +214,7 @@ watch([selectedYear, startRating, endRating, selectedSort], () => {
                         </li>
                         <li v-for="genre in genres" :key="genre.id" class="dropdown__nested-item"
                             @click="genreChange(genre.id)">
-                            <input type="checkbox" :id="genre.id" :value="genre.id" v-model="selectedGenres">
+                            <input type="checkbox" :id="genre.id" :value="genre.id" v-model="queryParams.genres">
                             <p class="transparent">{{ genre.name }}</p>
                         </li>
                     </ul>
@@ -186,9 +225,9 @@ watch([selectedYear, startRating, endRating, selectedSort], () => {
                         <h4 class="transparent">User rating</h4>
                     </div>
                     <div class="dropdown__nested-rating">
-                        <ma-input v-model="startRating"/>
+                        <ma-input v-model="queryParams.startRating" @change="ratingChange"/>
                         <p>to</p>
-                        <ma-input v-model="endRating"/>
+                        <ma-input v-model="queryParams.endRating" @change="ratingChange"/>
                     </div>
 
                 </div>
@@ -205,7 +244,7 @@ watch([selectedYear, startRating, endRating, selectedSort], () => {
         <section>
             <movies-list :movies="movies"></movies-list>
         </section>
-        <ma-pagination :page="page" :total-pages="totalPages" @change="changePage"></ma-pagination>
+        <ma-pagination :page="queryParams.page" :total-pages="totalPages" @change="changePage"></ma-pagination>
     </main>
 </template>
 
