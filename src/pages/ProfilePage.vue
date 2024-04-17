@@ -205,7 +205,7 @@ onMounted(async () => {
                 <span class="error-message" v-if="!!errorConfirmPassword">{{ errorConfirmPassword }}</span>
                 <span class="help">If you do not need to change the password, leave the field blank.</span>
             </div>
-            <ma-button @click="saveProfile">Save</ma-button>
+            <ma-button class="btn" @click="saveProfile">Save</ma-button>
         </form>
     </div>
     <MaToast :type="typeToast" :message="toastMessage" v-if="showToastMessage" @close="showToastMessage = false"/>
@@ -344,6 +344,10 @@ input[type="date"] {
     border-radius: 3px;
 }
 
+.btn {
+    border-radius: 28px;
+    width: 25%;
+}
 @media screen and(max-width: 1024px) {
     .user__setting {
         gap: 20px;
