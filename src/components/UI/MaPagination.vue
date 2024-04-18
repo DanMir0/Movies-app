@@ -51,7 +51,7 @@ const displayedPages = computed(() => {
     <div class="pagination">
         <ul class="page__wrapper">
             <li v-if="props.page !== 1">
-                <router-link to="#" @click="$emit('change', props.page - 1)">Prev</router-link>
+                <router-link to="/" :query="{page: props.page + 1}" @click="$emit('change', props.page - 1)">Prev</router-link>
             </li>
             <li
                 v-for="pageNumber in displayedPages"
@@ -60,18 +60,18 @@ const displayedPages = computed(() => {
                 :class="{'current-page': props.page === pageNumber}"
             >
                 <router-link
-                    to="#"
+                    to="/"
+                    :query="{page: pageNumber}"
                     @click="$emit('change', pageNumber)"
                 >
                     {{ pageNumber }}
                 </router-link>
             </li>
             <li v-if="props.page !== totalPages">
-                <router-link to="#" @click="$emit('change', props.page + 1)">Next</router-link>
+                <router-link to="/" :query="{page: props.page + 1}" @click="$emit('change', props.page + 1)">Next</router-link>
             </li>
         </ul>
     </div>
-    <p>props - {{ props.page }}</p>
 </template>
 
 <style scoped>
