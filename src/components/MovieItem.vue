@@ -3,12 +3,14 @@ import useMoviesGenres from "@/composable/useMoviesGenres";
 import {computed, ref} from "vue";
 import useUser from "@/composable/useUser";
 import MaToast from "@/components/UI/MaToast.vue";
+import router from "@/router/router";
 
 const props = defineProps({
     movie: Object,
     required: true,
 })
 
+const {user} = useUser()
 const showToastMessage = ref(false);
 const toastMessage = ref("")
 const typeToast = ref('')
@@ -18,11 +20,14 @@ function showToast(message, type) {
     typeToast.value = type
 }
 const {addFavorite} = useUser()
-const showFavoriteIcon = ref(false)
 
 const onAddFavorite = () => {
     try {
-        addFavorite(props.movie)
+        if (Object.keys(user.value).length !== 0) {
+            addFavorite(props.movie)
+        } else {
+            router.push({name: 'LoginPage'})
+        }
     } catch (e) {
         showToast(e.message, 'error')
         throw e
