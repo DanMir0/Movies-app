@@ -23,7 +23,7 @@ const {addFavorite} = useUser()
 
 const onAddFavorite = () => {
     try {
-        if (Object.keys(user.value).length !== 0) {
+        if (user.value.email) {
             addFavorite(props.movie)
         } else {
             router.push({name: 'LoginPage'})
