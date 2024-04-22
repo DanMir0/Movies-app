@@ -25,12 +25,9 @@ const sortOptions = ref([
     {value: 'vote_average.desc', name: 'Vote average desc'},
 ])
 const queryParams = ref({
-    page: 1,
-    sort: 'popularity.desc',
-    year: 2024,
-    genres: [],
     startRating: 0,
     endRating: 10,
+    genres: []
 })
 
 const totalPages = ref(1)
@@ -69,19 +66,20 @@ const toggleNestedDropdownRating = () => {
     showNestedDropdownRating.value = !showNestedDropdownRating.value
 };
 
-const onSelectedSort = (sort) => {
-    queryParams.value.sort = sort
-    router.push({ query: queryParams.value})
-}
-
 const filterMovies = async () => {
+    let genres = []
+    if (Array.isArray(route.query.genres)) {
+        genres = route.query.genres;
+    } else {
+        genres = [route.query.genres];
+    }
     const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
         params: {
             api_key: '42b000d5a4c2a76ed3400dcd6cd491e0',
             'primary_release_year': route.query.year || 2024,
             'vote_average.gte': route.query.startRating || 0,
             'vote_average.lte': route.query.endRating || 10,
-            'with_genres': route.query.genres || '',
+            'with_genres':  genres.join(',') || '',
             'sort_by': route.query.sort || 'popularity.desc',
             'page': route.query.page || 1
         }
@@ -102,66 +100,56 @@ const movies = computed(() => {
     })
 })
 
-
 const genreChange = (idGenre) => {
     if (queryParams.value.genres.includes(idGenre)) {
         queryParams.value.genres = queryParams.value.genres.filter(id => id !== idGenre)
     } else {
         queryParams.value.genres.push(idGenre)
     }
-    queryParams.value.page = 1
-    router.push({ query: {...queryParams.value, genres: queryParams.value.genres.join(',')} });
-    filterMovies()
+
+    router.push({query: {...queryParams.value, page: 1, genres: queryParams.value.genres}});
 }
 
-function changePage(pageNumber) {
-    console.log(pageNumber)
-    if (pageNumber !== '...') {
-        queryParams.value.page = pageNumber
-        router.push({ query: {page: pageNumber} });
-    }
-    console.log(queryParams.value)
-}
 function yearChange(year) {
-    queryParams.value.year = year
-    router.push({ query: queryParams.value });
+    router.push({query: {...route.query, page: 1, year: year}});
 }
 
 function ratingChange() {
-    router.push({query: queryParams.value})
+    router.push({
+        query: {
+            ...route.query,
+            page: 1,
+            startRating: queryParams.value.startRating,
+            endRating: queryParams.value.endRating
+        }
+    })
 }
+
 onMounted(() => {
     filterMovies()
 })
 
 watch(() => route.query.page, () => {
-    router.push({query: {page: queryParams.value.page}})
     filterMovies()
 })
 
-watch(() => queryParams.value.sort, () => {
-    queryParams.value.page = 1
-    router.push({ query: queryParams.value});
+watch(() => route.query.sort, () => {
+    filterMovies()
+})
 
+watch(() => route.query.year, () => {
     filterMovies()
 })
-watch(() => queryParams.value.year, () => {
-    queryParams.value.page = 1
-    router.push({ query: queryParams.value})
-    filterMovies()
-})
+
 watch(() => route.query.genres, () => {
-    router.push({ query: {...queryParams.value, genres: queryParams.value.genres.join(',')}})
     filterMovies()
 })
-watch(() => queryParams.value.startRating, () => {
-    queryParams.value.page = 1
-    router.push({ query: queryParams.value})
+
+watch(() => route.query.startRating, () => {
     filterMovies()
 })
-watch(() => queryParams.value.endRating, () => {
-    queryParams.value.page = 1
-    router.push({ query: queryParams.value})
+
+watch(() => route.query.endRating, () => {
     filterMovies()
 })
 </script>
@@ -201,7 +189,8 @@ watch(() => queryParams.value.endRating, () => {
                             <h4 class="transparent">Year</h4>
                         </li>
                         <li v-for="year in 24" :key="year" class="dropdown__nested-item">
-                            <input type="radio" :id="'year-'+ year" :value="2000 + year" v-model="queryParams.year"  @click="yearChange(2000 + year)">
+                            <input type="radio" :id="'year-'+ year" :value="2000 + year"
+                                   @click="yearChange(2000 + year)">
                             <p class="transparent">{{ 2000 + year }}</p>
                         </li>
                     </ul>
@@ -235,7 +224,9 @@ watch(() => queryParams.value.endRating, () => {
                     <ul class="dropdown__lists">
                         <li v-for="option in sortOptions" :key="option.value" :value="option.value"
                             class="dropdown__nested-item">
-                            <p class="transparent" @click="onSelectedSort(option.value)">{{ option.name }}</p>
+                            <router-link class="sort" :to="{name:'FilterPage', query:{...route.query, page:1, sort:option.value}}">
+                                {{ option.name }}
+                            </router-link>
                         </li>
                     </ul>
                 </div>
@@ -244,7 +235,8 @@ watch(() => queryParams.value.endRating, () => {
         <section>
             <movies-list :movies="movies"></movies-list>
         </section>
-        <ma-pagination :page="queryParams.page" :total-pages="totalPages" @change="changePage"></ma-pagination>
+        <ma-pagination :page="Number(route.query.page) || 1" :total-pages="totalPages">
+        </ma-pagination>
     </main>
 </template>
 
@@ -254,10 +246,12 @@ watch(() => queryParams.value.endRating, () => {
     display: flex;
     justify-content: flex-end;
 }
+
 .menu {
     max-width: 1130px;
     margin: 0 20px;
 }
+
 .dropdown__content {
     position: absolute;
     padding: 10px;
@@ -367,10 +361,16 @@ input[type="radio"]:checked, input[type="checkbox"]:checked {
     background-repeat: no-repeat;
 }
 
+.sort {
+    background-color: transparent;
+    text-decoration: none;
+}
+
 @media screen and (max-width: 1024px) {
     .desktop {
         display: none;
     }
+
     .menu {
         max-width: 793px;
     }
@@ -380,6 +380,7 @@ input[type="radio"]:checked, input[type="checkbox"]:checked {
     .desktop {
         display: none;
     }
+
     .menu {
         margin: 0 10px;
     }

@@ -1,12 +1,13 @@
 <script setup>
 import {computed} from "vue";
+import {useRoute} from "vue-router";
+
+const route = useRoute()
 
 const props = defineProps({
     totalPages: Number,
     page: Number
 })
-
-const emit = defineEmits(['change'])
 
 const displayedPages = computed(() => {
     const result = [];
@@ -51,7 +52,8 @@ const displayedPages = computed(() => {
     <div class="pagination">
         <ul class="page__wrapper">
             <li v-if="props.page !== 1">
-                <router-link to="/" :query="{page: props.page + 1}" @click="$emit('change', props.page - 1)">Prev</router-link>
+                <router-link :to="{name:'FilterPage', params:{}, query:{...route.query, page:props.page - 1}}">Prev
+                </router-link>
             </li>
             <li
                 v-for="pageNumber in displayedPages"
@@ -60,15 +62,14 @@ const displayedPages = computed(() => {
                 :class="{'current-page': props.page === pageNumber}"
             >
                 <router-link
-                    to="/"
-                    :query="{page: pageNumber}"
-                    @click="$emit('change', pageNumber)"
+                    :to="{name:'FilterPage', params:{}, query:{...route.query, page: pageNumber}}"
                 >
                     {{ pageNumber }}
                 </router-link>
             </li>
             <li v-if="props.page !== totalPages">
-                <router-link to="/" :query="{page: props.page + 1}" @click="$emit('change', props.page + 1)">Next</router-link>
+                <router-link :to="{name:'FilterPage', params:{}, query:{...route.query, page:props.page + 1}}">Next
+                </router-link>
             </li>
         </ul>
     </div>
