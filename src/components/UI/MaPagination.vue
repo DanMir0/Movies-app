@@ -1,38 +1,46 @@
 <script setup>
 import {computed} from "vue";
+import {useRoute} from "vue-router";
+
+const route = useRoute()
 
 const props = defineProps({
     totalPages: Number,
     page: Number
 })
 
-const emit = defineEmits(['change'])
-
 const displayedPages = computed(() => {
     const result = [];
     const displayPage = 5;
     const startPage = 1;
+    let currentPage = props.page
     const endPage = props.totalPages
 
-    if (props.page < displayPage - 1) {
-        for (let i = startPage; i <= displayPage; i++) {
-            result.push(i);
+    if (endPage <= displayPage) {
+        for (let i = startPage; i <= endPage; i++) {
+            result.push(i)
         }
-        if (endPage > displayPage) {
-            result.push('...');
-            result.push(endPage);
-        }
-    } else if (props.page > displayPage - 2) {
-        if (startPage < props.page - 2) {
-            result.push(startPage);
-            result.push('...');
-        }
-        for (let i = Math.max(startPage, props.page - 2); i <= Math.min(props.page + 2, endPage); i++) {
-            result.push(i);
-        }
-        if (endPage > props.page + 2 && props.page !== endPage - 2) {
-            result.push('...');
-            result.push(endPage);
+    } else {
+        if (currentPage < displayPage - 1) {
+            for (let i = startPage; i <= displayPage; i++) {
+                result.push(i);
+            }
+            if (endPage > displayPage) {
+                result.push('...');
+                result.push(endPage);
+            }
+        } else if (currentPage > displayPage - 2) {
+            if (startPage < currentPage - 2) {
+                result.push(startPage);
+                result.push('...');
+            }
+            for (let i = Math.max(startPage, currentPage - 2); i <= Math.min(currentPage + 2, endPage); i++) {
+                result.push(i);
+            }
+            if (endPage > currentPage + 2 && currentPage !== endPage - 2) {
+                result.push('...');
+                result.push(endPage);
+            }
         }
     }
 
@@ -43,21 +51,26 @@ const displayedPages = computed(() => {
 <template>
     <div class="pagination">
         <ul class="page__wrapper">
-            <li v-if="props.page !== 1"><a href="#" @click="$emit('change', props.page - 1)">Prev</a></li>
+            <li v-if="props.page !== 1">
+                <router-link :to="{name:'FilterPage', params:{}, query:{...route.query, page:props.page - 1}}">Prev
+                </router-link>
+            </li>
             <li
                 v-for="pageNumber in displayedPages"
                 :key="pageNumber"
                 class="page"
                 :class="{'current-page': props.page === pageNumber}"
             >
-                <a
-                    href="#"
-                    @click="$emit('change', pageNumber)"
+                <router-link
+                    :to="{name:'FilterPage', params:{}, query:{...route.query, page: pageNumber}}"
                 >
                     {{ pageNumber }}
-                </a>
+                </router-link>
             </li>
-            <li v-if="props.page !== totalPages"><a href="#" @click="$emit('change', props.page + 1)">Next</a></li>
+            <li v-if="props.page !== totalPages">
+                <router-link :to="{name:'FilterPage', params:{}, query:{...route.query, page:props.page + 1}}">Next
+                </router-link>
+            </li>
         </ul>
     </div>
 </template>

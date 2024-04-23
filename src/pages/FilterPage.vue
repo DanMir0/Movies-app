@@ -4,15 +4,17 @@ import {computed, onMounted, ref, watch} from "vue";
 import MoviesList from "@/components/MoviesList.vue";
 import useMoviesGenres from "@/composable/useMoviesGenres";
 import useUser from "@/composable/useUser";
+import {useRoute} from "vue-router";
+import router from "@/router/router";
 
 const moviesOrigin = ref([])
 const {user} = useUser()
-const selectedYear = ref('')
 const showFilterDropdown = ref(false);
 const showNestedDropdownYear = ref(false);
 const showNestedDropdownGenres = ref(false)
 const showNestedDropdownRating = ref(false)
 const showSortDropdown = ref(false)
+const route = useRoute()
 
 const sortOptions = ref([
     {value: 'popularity.asc', name: 'Popularity asc'},
@@ -22,14 +24,12 @@ const sortOptions = ref([
     {value: 'vote_average.asc', name: 'Vote average asc'},
     {value: 'vote_average.desc', name: 'Vote average desc'},
 ])
-const selectedSort = ref('popularity.desc')
+const queryParams = ref({
+    startRating: 0,
+    endRating: 10,
+    genres: []
+})
 
-const selectedGenres = ref([])
-
-const startRating = ref()
-const endRating = ref()
-
-const page = ref(1)
 const totalPages = ref(1)
 
 const {genres} = useMoviesGenres()
@@ -66,20 +66,22 @@ const toggleNestedDropdownRating = () => {
     showNestedDropdownRating.value = !showNestedDropdownRating.value
 };
 
-const onSelectedSort = (sort) => {
-    selectedSort.value = sort
-}
-
 const filterMovies = async () => {
+    let genres = []
+    if (Array.isArray(route.query.genres)) {
+        genres = route.query.genres;
+    } else {
+        genres = [route.query.genres];
+    }
     const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
         params: {
             api_key: '42b000d5a4c2a76ed3400dcd6cd491e0',
-            'primary_release_year': selectedYear.value,
-            'vote_average.gte': startRating.value,
-            'vote_average.lte': endRating.value = 10,
-            'with_genres': selectedGenres.value.join(','),
-            'sort_by': selectedSort.value,
-            'page': page.value
+            'primary_release_year': route.query.year || 2024,
+            'vote_average.gte': route.query.startRating || 0,
+            'vote_average.lte': route.query.endRating || 10,
+            'with_genres':  genres.join(',') || '',
+            'sort_by': route.query.sort || 'popularity.desc',
+            'page': route.query.page || 1
         }
     })
     moviesOrigin.value = response.data.results
@@ -98,31 +100,56 @@ const movies = computed(() => {
     })
 })
 
-
 const genreChange = (idGenre) => {
-    if (selectedGenres.value.includes(idGenre)) {
-        selectedGenres.value = selectedGenres.value.filter(id => id !== idGenre)
+    if (queryParams.value.genres.includes(idGenre)) {
+        queryParams.value.genres = queryParams.value.genres.filter(id => id !== idGenre)
     } else {
-        selectedGenres.value.push(idGenre)
+        queryParams.value.genres.push(idGenre)
     }
-    page.value = 1
-    filterMovies()
+
+    router.push({query: {...queryParams.value, page: 1, genres: queryParams.value.genres}});
 }
 
-function changePage(pageNumber) {
-    if (pageNumber !== '...') {
-        page.value = pageNumber
-    }
+function yearChange(year) {
+    router.push({query: {...route.query, page: 1, year: year}});
 }
 
-onMounted(filterMovies)
+function ratingChange() {
+    router.push({
+        query: {
+            ...route.query,
+            page: 1,
+            startRating: queryParams.value.startRating,
+            endRating: queryParams.value.endRating
+        }
+    })
+}
 
-watch(page, () => {
+onMounted(() => {
     filterMovies()
 })
 
-watch([selectedYear, startRating, endRating, selectedSort], () => {
-    page.value = 1
+watch(() => route.query.page, () => {
+    filterMovies()
+})
+
+watch(() => route.query.sort, () => {
+    filterMovies()
+})
+
+watch(() => route.query.year, () => {
+    filterMovies()
+})
+
+watch(() => route.query.genres, () => {
+    filterMovies()
+})
+
+watch(() => route.query.startRating, () => {
+    filterMovies()
+})
+
+watch(() => route.query.endRating, () => {
     filterMovies()
 })
 </script>
@@ -162,7 +189,8 @@ watch([selectedYear, startRating, endRating, selectedSort], () => {
                             <h4 class="transparent">Year</h4>
                         </li>
                         <li v-for="year in 24" :key="year" class="dropdown__nested-item">
-                            <input type="radio" :id="'year-'+ year" :value="2000 + year" v-model="selectedYear">
+                            <input type="radio" :id="'year-'+ year" :value="2000 + year"
+                                   @click="yearChange(2000 + year)">
                             <p class="transparent">{{ 2000 + year }}</p>
                         </li>
                     </ul>
@@ -175,7 +203,7 @@ watch([selectedYear, startRating, endRating, selectedSort], () => {
                         </li>
                         <li v-for="genre in genres" :key="genre.id" class="dropdown__nested-item"
                             @click="genreChange(genre.id)">
-                            <input type="checkbox" :id="genre.id" :value="genre.id" v-model="selectedGenres">
+                            <input type="checkbox" :id="genre.id" :value="genre.id" v-model="queryParams.genres">
                             <p class="transparent">{{ genre.name }}</p>
                         </li>
                     </ul>
@@ -186,9 +214,9 @@ watch([selectedYear, startRating, endRating, selectedSort], () => {
                         <h4 class="transparent">User rating</h4>
                     </div>
                     <div class="dropdown__nested-rating">
-                        <ma-input v-model="startRating"/>
+                        <ma-input v-model="queryParams.startRating" @change="ratingChange"/>
                         <p>to</p>
-                        <ma-input v-model="endRating"/>
+                        <ma-input v-model="queryParams.endRating" @change="ratingChange"/>
                     </div>
 
                 </div>
@@ -196,7 +224,9 @@ watch([selectedYear, startRating, endRating, selectedSort], () => {
                     <ul class="dropdown__lists">
                         <li v-for="option in sortOptions" :key="option.value" :value="option.value"
                             class="dropdown__nested-item">
-                            <p class="transparent" @click="onSelectedSort(option.value)">{{ option.name }}</p>
+                            <router-link class="sort" :to="{name:'FilterPage', query:{...route.query, page:1, sort:option.value}}">
+                                {{ option.name }}
+                            </router-link>
                         </li>
                     </ul>
                 </div>
@@ -205,7 +235,8 @@ watch([selectedYear, startRating, endRating, selectedSort], () => {
         <section>
             <movies-list :movies="movies"></movies-list>
         </section>
-        <ma-pagination :page="page" :total-pages="totalPages" @change="changePage"></ma-pagination>
+        <ma-pagination :page="Number(route.query.page) || 1" :total-pages="totalPages">
+        </ma-pagination>
     </main>
 </template>
 
@@ -215,10 +246,12 @@ watch([selectedYear, startRating, endRating, selectedSort], () => {
     display: flex;
     justify-content: flex-end;
 }
+
 .menu {
     max-width: 1130px;
     margin: 0 20px;
 }
+
 .dropdown__content {
     position: absolute;
     padding: 10px;
@@ -328,10 +361,16 @@ input[type="radio"]:checked, input[type="checkbox"]:checked {
     background-repeat: no-repeat;
 }
 
+.sort {
+    background-color: transparent;
+    text-decoration: none;
+}
+
 @media screen and (max-width: 1024px) {
     .desktop {
         display: none;
     }
+
     .menu {
         max-width: 793px;
     }
@@ -341,6 +380,7 @@ input[type="radio"]:checked, input[type="checkbox"]:checked {
     .desktop {
         display: none;
     }
+
     .menu {
         margin: 0 10px;
     }

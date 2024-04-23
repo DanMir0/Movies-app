@@ -31,7 +31,8 @@ const routes = [
             {
                 path: '',
                 name: 'FilterPage',
-                component: FilterPage
+                component: FilterPage,
+                props: true
             },
             {
                 path: '/search/',
