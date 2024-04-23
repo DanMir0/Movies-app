@@ -130,9 +130,8 @@ onMounted(async () => {
                     placeholder="Email..."
                     readonly
                 />
-                <img v-if="!isVerification" src="@/icons/not-found.svg" @click="onSendVerification"
-                     class="icon icon__verif" alt="Email not verify"/>
-                <img v-else src="@/icons/not-found.svg" class="icon" alt="Email is verify"/>
+                <span v-if="!isVerification" class="icon icon__no-verify" @click="onSendVerification"></span>
+                <span v-else class="icon icon-verify"></span>
                 <span class="help">If you change your email, a confirmation email will be sent to you.</span>
             </div>
             <div class="setting__item">
@@ -205,9 +204,8 @@ onMounted(async () => {
                 </ma-input>
                 <span class="error-message" v-if="!!errorConfirmPassword">{{ errorConfirmPassword }}</span>
                 <span class="help">If you do not need to change the password, leave the field blank.</span>
-
             </div>
-            <ma-button @click="saveProfile">Save</ma-button>
+            <ma-button class="btn" @click="saveProfile">Save</ma-button>
         </form>
     </div>
     <MaToast :type="typeToast" :message="toastMessage" v-if="showToastMessage" @close="showToastMessage = false"/>
@@ -232,6 +230,7 @@ onMounted(async () => {
     gap: 30px;
     max-width: 530px;
     width: 100%;
+    padding: 15px;
 }
 
 .setting__item {
@@ -252,20 +251,31 @@ onMounted(async () => {
 }
 
 .icon {
-    background-color: transparent;
-    font-size: 12px;
     position: absolute;
-    top: 43%;
-    transform: translateY(-12%);
-    right: 4%;
+    top: 37px;
+    right: 22px;
+    width: 16px;
+    height: 16px;
+    background-repeat: no-repeat;
+    background-size: cover;
+
 }
 
-.icon__verif:hover {
+.icon__no-verify {
+    background-image: url("/src/icons/not-found.svg");
+}
+
+.icon__no-verify:hover {
     opacity: 0.8;
     cursor: pointer;
 }
 
+.icon-verify {
+background-image: url("/src/icons/complete.svg");
+}
+
 #userEmail {
+    position: relative;
     color: #7E7E7E;
 }
 
@@ -273,12 +283,7 @@ onMounted(async () => {
     display: flex;
     width: 100%;
     justify-content: space-between;
-}
-
-.group__btn {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
+    gap: 10px;
 }
 
 .group__password {
@@ -337,5 +342,21 @@ input[type="date"] {
     padding: 5px;
     cursor: pointer;
     border-radius: 3px;
+}
+
+.btn {
+    border-radius: 28px;
+    width: 25%;
+}
+@media screen and(max-width: 1024px) {
+    .user__setting {
+        gap: 20px;
+        max-width: 500px;
+    }
+}
+@media screen and(max-width: 375px) {
+    .user__setting {
+        gap: 15px;
+    }
 }
 </style>

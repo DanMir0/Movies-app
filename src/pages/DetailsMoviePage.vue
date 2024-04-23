@@ -66,15 +66,15 @@ watchEffect(async () => {
             <img :src="getMoviePosterUrl(movie.poster_path)" :alt="movie.title">
             <div class="poster__group">
                 <div class="poster__info">
-                    <img src="../icons/imdb.svg" alt="Vote average">
+                    <span class="movie__icon movie__icon-imdb"></span>
                     <b>{{ movieVoteAverage }}</b>
                 </div>
                 <div class="poster__info">
-                    <img src="../icons/like.svg" alt="Vote average">
+                    <span class="movie__icon movie__icon-like"></span>
                     <b>{{ movie.vote_count }}</b>
                 </div>
                 <div class="poster__info">
-                    <img src="../icons/eye.svg" alt="Vote average">
+                    <span class="movie__icon movie__icon-eye"></span>
                     <b>{{ moviePopularity }}</b>
                 </div>
             </div>
@@ -174,5 +174,36 @@ a {
 
 a:hover {
     color: #b8860b;
+}
+
+.movie__icon {
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 25px;
+    height: 25px;
+}
+
+.movie__icon-imdb {
+    background-image: url("/src/icons/imdb.svg");
+}
+
+.movie__icon-like {
+    background-image: url("/src/icons/like.svg");
+}
+
+.movie__icon-eye {
+    background-image: url("/src/icons/eye.svg");
+}
+
+@media screen and (max-width: 670px) {
+    .movie {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .movie__info-items {
+        align-items: center;
+    }
 }
 </style>

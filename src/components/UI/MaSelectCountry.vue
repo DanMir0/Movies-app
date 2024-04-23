@@ -244,13 +244,13 @@ select {
     /* Reset Select */
     appearance: none;
     outline: 10px red;
-    border: 1px solid #424242;
+    border: 1px solid transparent;
     box-shadow: none;
     /* Personalize */
     flex: 1;
     padding: 0 1em;
     color: #ffffff;
-    background-color: transparent;
+
     background-image: none;
     cursor: pointer;
 }
@@ -262,10 +262,11 @@ select::-ms-expand {
 .select {
     position: relative;
     display: flex;
-
+    border: 1px solid #424242;
     height: 3em;
-    border-radius: .25em;
+    border-radius: 28px;
     overflow: hidden;
+    background-color: transparent;
 }
 
 /* Arrow */
