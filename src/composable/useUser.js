@@ -165,6 +165,14 @@ export default function useUser() {
         }
     }
 
+    const getFavorites = async () => {
+        const userDocRef = doc(db, "users", user.value.uid)
+        const userDocSnap = await getDoc(userDocRef)
+        const userData = userDocSnap.data()
+
+        return userData.favorites;
+    }
+
     const saveUserInDb = async (email, userId) => {
         await setDoc(doc(db, "users", userId), {
             email: email
@@ -174,7 +182,7 @@ export default function useUser() {
     const signUp = async (email, password) => {
         try {
             let newUser = await createUserWithEmailAndPassword(auth, email, password)
-            console.log(newUser.user.uid)
+
             await saveUserInDb(email, newUser.user.uid)
         } catch (error) {
             if (error.code === 'auth/weak-password') {
@@ -203,6 +211,7 @@ export default function useUser() {
         savePassword,
         saveInfoUser,
         addFavorite,
-        signUp
+        signUp,
+        getFavorites,
     }
 }
