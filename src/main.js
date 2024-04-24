@@ -7,6 +7,7 @@ import MaModal from "@/components/UI/MaModal.vue";
 import MaContainer from "@/components/UI/MaContainer.vue";
 import MaButton from "@/components/UI/MaButton.vue";
 import MaForm from "@/components/UI/MaForm.vue";
+import MaDropdown from "@/components/UI/MaDropdown.vue";
 
 const app = createApp(App)
 
@@ -17,5 +18,6 @@ app
     .component('ma-modal', MaModal)
     .component('ma-input', MaInput)
     .component('ma-pagination', MaPagination)
+    .component('ma-dropdown', MaDropdown)
     .use(router)
     .mount('#app')
