@@ -52,7 +52,11 @@ const displayedPages = computed(() => {
     <div class="pagination">
         <ul class="page__wrapper">
             <li v-if="props.page !== 1">
-                <router-link :to="{name:'FilterPage', params:{}, query:{...route.query, page:props.page - 1}}">Prev
+                <router-link v-if="route.path.includes('/search/')"
+                             :to="{name:'SearchPage', params:{}, query:{...route.query, page:props.page - 1}}">Prev
+                </router-link>
+                <router-link v-else :to="{name:'FilterPage', params:{}, query:{...route.query, page:props.page - 1}}">
+                    Prev
                 </router-link>
             </li>
             <li
@@ -61,14 +65,22 @@ const displayedPages = computed(() => {
                 class="page"
                 :class="{'current-page': props.page === pageNumber}"
             >
-                <router-link
-                    :to="{name:'FilterPage', params:{}, query:{...route.query, page: pageNumber}}"
+                <router-link v-if="route.path.includes('/search/')"
+                             :to="{name:'SearchPage', params:{}, query:{...route.query, page: pageNumber}}">
+                    {{ pageNumber }}
+                </router-link>
+                <router-link v-else
+                             :to="{name:'FilterPage', params:{}, query:{...route.query, page: pageNumber}}"
                 >
                     {{ pageNumber }}
                 </router-link>
             </li>
             <li v-if="props.page !== totalPages">
-                <router-link :to="{name:'FilterPage', params:{}, query:{...route.query, page:props.page + 1}}">Next
+                <router-link v-if="route.path.includes('/search/')"
+                             :to="{name:'SearchPage', params:{}, query:{...route.query, page:props.page + 1}}">Next
+                </router-link>
+                <router-link v-else :to="{name:'FilterPage', params:{}, query:{...route.query, page:props.page + 1}}">
+                    Next
                 </router-link>
             </li>
         </ul>
