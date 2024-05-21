@@ -1,14 +1,19 @@
 <script setup>
-import {onMounted, onUnmounted, ref} from "vue";
+import {onMounted, onUnmounted, ref, watch} from "vue";
 import useUser from "@/composable/useUser";
 import {signOut} from "firebase/auth";
 import router from "@/router/router";
 
 const searchQuery = ref('')
 const {getCurrentUser, auth, user} = useUser()
+const userPhoto = ref(null)
+const displayName = ref(null)
 
 onMounted(async () => {
     await getCurrentUser()
+    console.log(user)
+    userPhoto.value = user.value.photoURL
+    displayName.value = user.value.displayName
 })
 
 const userSignOut = () => {
@@ -48,6 +53,14 @@ const expandSearch = () => {
         searchQuery.value = ''
     }
 }
+
+watch(() => user.value.photoURL, (newPhotoURL) => {
+    userPhoto.value = newPhotoURL
+})
+
+watch(() => user.value.displayName, (newDisplayName) => {
+    displayName.value = newDisplayName
+})
 </script>
 
 <template>
@@ -129,7 +142,10 @@ const expandSearch = () => {
             </div>
         </div>
         <div v-if="user.uid" class="dropdown">
-            <p @click="toggleDropdown">profile</p>
+            <div class="navbar__profile"  @click="toggleDropdown">
+                <img class="photo" :src="userPhoto">
+                <p>{{displayName}}</p>
+            </div>
             <div v-show="showDropdown" class="dropdown__open">
                 <ul class="dropdown__lists">
                     <li class="dropdown__list">
@@ -167,6 +183,11 @@ const expandSearch = () => {
     border-bottom: 1px solid #424242;
     margin-bottom: 30px;
     gap: 15px;
+}
+
+.photo {
+    width: 30px;
+    border-radius: 50%;
 }
 
 .tablet {
@@ -295,6 +316,12 @@ hr {
 
 .mobile {
     display: none;
+}
+
+.navbar__profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 @media screen and (max-width: 1024px) {

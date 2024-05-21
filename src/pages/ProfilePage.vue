@@ -21,7 +21,8 @@ const {
     auth,
     updateUsername,
     sendVerification,
-    resetPassword
+    resetPassword,
+    savePhoto,
 } = useUser()
 
 const email = ref('')
@@ -33,6 +34,9 @@ const isVerification = ref(false)
 const country = ref('')
 const sex = ref('')
 const dateOfBirth = ref('')
+const photo = ref('')
+let urlPhoto = ''
+
 
 const errorNewPassword = ref('')
 const errorConfirmPassword = ref('')
@@ -88,6 +92,10 @@ const saveProfile = async () => {
         await saveInfoUser(sex.value, country.value, dateOfBirth.value)
         showToast('Changed!', 'success')
     }
+    if (urlPhoto) {
+        await savePhoto(urlPhoto)
+        showToast('Changed!', 'success')
+    }
 }
 
 const onSendVerification = async () => {
@@ -108,6 +116,7 @@ const onResetPassword = async () => {
     }
 }
 
+
 onMounted(async () => {
     email.value = user.value.email
     username.value = user.value.displayName
@@ -115,11 +124,32 @@ onMounted(async () => {
     sex.value = user.value.sex
     country.value = user.value.country
     dateOfBirth.value = user.value.dateOfBirth
+    photo.value = user.value.photoURL
 })
+
+const changeImage = (e) => {
+    urlPhoto = e.target.files[0];
+    if (urlPhoto) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const imgElement = document.querySelector('.img-c');
+            if (imgElement) {
+                imgElement.src = event.target.result;
+            }
+        };
+        reader.readAsDataURL(urlPhoto);
+    }
+}
 </script>
 
 <template>
     <div class="user__page">
+        <div class="user__photo">
+            <img class="img-c" :src="photo" alt="profile image">
+            <label class="upload-img" for="input-file">Choose file</label>
+            <input id="input-file" type="file" accept="image/jpeg, image/png, image/jpg" @change="changeImage">
+        </div>
+
         <form class="user__setting" @submit.prevent>
             <div class="setting__item">
                 <label class="label__setting" for="userEmail">Email</label>
@@ -217,6 +247,12 @@ onMounted(async () => {
     color: #ff0000;
 }
 
+.user__photo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
 .user__page {
     display: flex;
     flex-direction: column;
@@ -258,7 +294,6 @@ onMounted(async () => {
     height: 16px;
     background-repeat: no-repeat;
     background-size: cover;
-
 }
 
 .icon__no-verify {
@@ -271,7 +306,7 @@ onMounted(async () => {
 }
 
 .icon-verify {
-background-image: url("/src/icons/complete.svg");
+    background-image: url("/src/icons/complete.svg");
 }
 
 #userEmail {
@@ -348,12 +383,37 @@ input[type="date"] {
     border-radius: 28px;
     width: 25%;
 }
+
+.img-c {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+}
+
+.upload-img {
+    border-radius: 28px;
+    text-align: center;
+    padding: 0.7em 2em;
+    background-color: #303030;
+    border: none;
+}
+
+.upload-img:hover {
+    background-color: #3e3e3e;
+    cursor: pointer;
+}
+
+input[type='file'] {
+    display: none;
+}
+
 @media screen and(max-width: 1024px) {
     .user__setting {
         gap: 20px;
         max-width: 500px;
     }
 }
+
 @media screen and(max-width: 375px) {
     .user__setting {
         gap: 15px;
