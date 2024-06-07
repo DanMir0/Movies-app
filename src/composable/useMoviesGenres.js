@@ -12,9 +12,13 @@ export default function useMoviesGenres() {
         genres.value = response.data.genres
     }
 
-    const getGenresFromMovie = (genreIds) => {
+    const getGenresFromMovie = (genresMovie) => {
+        const genresId = Array.isArray(genresMovie) && typeof genresMovie[0] === 'object'
+            ? genresMovie.map(genre => genre.id)
+            : genresMovie
+
         return genres.value
-            .filter(genre => genreIds.includes(genre.id))
+            .filter(genre => genresId.includes(genre.id))
             .map(genre => genre.name)
     }
 

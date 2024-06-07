@@ -85,7 +85,7 @@ const {getGenresFromMovie} = useMoviesGenres()
                 </div>
             </div>
             <ul class="movie__lists">
-                <li v-for="genre in getGenresFromMovie(movie.genre_ids)">
+                <li v-for="genre in getGenresFromMovie(movie.genre_ids || movie.genres)">
                     <input
                         class="movie__genres"
                         type="text"
