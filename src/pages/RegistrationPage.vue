@@ -1,12 +1,14 @@
 <script setup>
 import {ref} from "vue";
-import {createUserWithEmailAndPassword, getAuth} from "firebase/auth";
+import {getAuth} from "firebase/auth";
 import router from "@/router/router";
 import MaPasswordInput from "@/components/UI/MaPasswordInput.vue";
 import useUser from "@/composable/useUser";
+import MaInput from "@/components/UI/MaInput.vue";
 
 const email = ref('')
 const password = ref('')
+const username = ref('')
 const confirmPassword = ref('')
 const error = ref('')
 const isError = ref(false)
@@ -16,11 +18,15 @@ const {signUp} = useUser()
 
 const onSignUp = async () => {
     try {
+        if (!username) {
+            isError.value = true
+            error.value = 'Username must not be empty.'
+        }
         if (password.value !== confirmPassword.value) {
             isError.value = true
             error.value = 'The passwords don\'t match.'
         } else {
-           await signUp(email.value, password.value)
+           await signUp(email.value, password.value, username.value)
             await router.push({name: 'FilterPage'})
         }
     } catch (e) {
@@ -46,6 +52,7 @@ const onSignUp = async () => {
                         </svg>
                     </span>
                 </div>
+                <ma-input type="text" v-model="username" placeholder="username"></ma-input>
                 <MaPasswordInput v-model="password"/>
                 <MaPasswordInput v-model="confirmPassword"/>
             </div>

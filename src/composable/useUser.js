@@ -12,6 +12,7 @@ import {
 import {db} from "@/confFirebase"
 import {doc, updateDoc, setDoc, getDoc, where, getDocs, collection, query} from "firebase/firestore"
 import {ref, watch} from "vue"
+import {getStorage, ref as storageRef, uploadBytes, getDownloadURL} from "firebase/storage";
 
 let promiseUser = null;
 
@@ -23,6 +24,7 @@ const user = ref({
     country: null,
     sex: null,
     dateOfBirth: null,
+    photoURL: null,
 })
 export default function useUser() {
     const auth = getAuth();
@@ -39,7 +41,7 @@ export default function useUser() {
                             user.value.uid = currentUser.uid
                             user.value.displayName = currentUser.displayName
                             user.value.emailVerified = currentUser.emailVerified
-
+                            user.value.photoURL = currentUser.photoURL || (await getDefaultPhotoURL())
                             const docSnap = await getDoc(doc(db, "users", user.value.uid));
                             if (docSnap.exists()) {
                                 user.value.country = docSnap.data().country
@@ -173,17 +175,24 @@ export default function useUser() {
         return userData.favorites;
     }
 
-    const saveUserInDb = async (email, userId) => {
+    const saveUserInDb = async (email, userId, username) => {
         await setDoc(doc(db, "users", userId), {
-            email: email
+            email: email,
+            displayName: username,
         })
     }
 
-    const signUp = async (email, password) => {
+    const signUp = async (email, password, username) => {
         try {
             let newUser = await createUserWithEmailAndPassword(auth, email, password)
 
-            await saveUserInDb(email, newUser.user.uid)
+            await checkUsernameExists(username)
+            await saveUserInDb(email, newUser.user.uid, username)
+            let currentUser = auth.currentUser
+            await updateProfile(currentUser, {
+                displayName: username
+            })
+            user.value.displayName = username
         } catch (error) {
             if (error.code === 'auth/weak-password') {
                 throw 'Password should be at least 6 characters.'
@@ -196,6 +205,41 @@ export default function useUser() {
             }
         }
     }
+
+    const getDefaultPhotoURL = async () => {
+        const storage = getStorage()
+        const defaultPhotoRef = storageRef(storage, `users/quest.png`);
+
+            const url = await getDownloadURL(defaultPhotoRef);
+            return url;
+    }
+
+    const savePhoto = async(file) => {
+        const storage = getStorage()
+        const userId = user.value.uid;
+
+        // Создаем ссылку на файл в Firebase Storage
+        const fileRef = storageRef(storage, `users/${userId}/${file.name}`);
+
+        await uploadBytes(fileRef, file)
+
+        const urlPhoto = await getDownloadURL(fileRef);
+
+        const currentUser = auth.currentUser;
+        await updateProfile(currentUser, {
+            photoURL: urlPhoto,
+        });
+
+        // Сохраняем URL фотографии в Firestore
+        const userDocRef = doc(db, "users", userId);
+        await updateDoc(userDocRef, {
+            photoURL: urlPhoto,
+        });
+
+        // Обновляем локальный объект user
+        user.value.photoURL = urlPhoto;
+    }
+
 
     watch(user, async () => {
         await getCurrentUser();
@@ -212,6 +256,7 @@ export default function useUser() {
         saveInfoUser,
         addFavorite,
         signUp,
+        savePhoto,
         getFavorites,
     }
 }
