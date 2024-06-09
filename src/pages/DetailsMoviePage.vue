@@ -11,6 +11,7 @@ let props = defineProps({
 })
 
 let movie = ref([])
+const isLoading = ref(true)
 
 const fetchingMovie = async () => {
     const response = await axios.get(`https://api.themoviedb.org/3/movie/${props.movie_id}`, {
@@ -19,6 +20,8 @@ const fetchingMovie = async () => {
         }
     })
     movie.value = response.data
+
+    isLoading.value = false
 }
 
 const movieId = computed(() => {
@@ -61,6 +64,7 @@ watchEffect(async () => {
 </script>
 
 <template>
+    <ma-loader :is-loading="isLoading"></ma-loader>
     <div class="movie">
         <section class="poster">
             <img :src="getMoviePosterUrl(movie.poster_path)" :alt="movie.title">
