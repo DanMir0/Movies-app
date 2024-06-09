@@ -3,9 +3,10 @@ import MoviesList from "@/components/MoviesList.vue";
 import {ref, watch} from "vue";
 import axios from "axios";
 import {useRoute} from "vue-router";
+import MaLoader from "@/components/MaLoader.vue";
 
 const route = useRoute()
-
+const isLoading = ref(true)
 const searchedMovies = ref([])
 
 const totalPages = ref(1)
@@ -20,6 +21,8 @@ const fetchingSearch = async () => {
     })
     searchedMovies.value = response.data.results
     totalPages.value = response.data.total_pages
+
+    isLoading.value = false
 }
 
 watch(() => route.query.q,
@@ -34,6 +37,7 @@ watch(() => route.query.page, () => {
 </script>
 
 <template>
+    <ma-loader :is-loading="isLoading"></ma-loader>
     <div class="search-page">
         <movies-list :movies="searchedMovies"></movies-list>
         <ma-pagination v-if="searchedMovies.length > 0" :total-pages="totalPages" :page="Number(route.query.page ) || 1"/>

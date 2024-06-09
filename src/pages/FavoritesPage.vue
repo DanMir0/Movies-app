@@ -3,10 +3,12 @@ import MoviesList from "@/components/MoviesList.vue";
 import useUser from "@/composable/useUser";
 import {onMounted, ref} from "vue";
 import axios from "axios";
+import MaLoader from "@/components/MaLoader.vue";
 
 const {getFavorites} = useUser()
 
 let movies = ref([])
+const isLoading = ref(true)
 
 const getFavoritesMovies = async () => {
     let moviesId = await getFavorites()
@@ -21,6 +23,7 @@ const getFavoritesMovies = async () => {
     }))
 
     movies.value = favoritesMovies
+    isLoading.value = false
 }
 
 onMounted(async () => {
@@ -30,6 +33,7 @@ onMounted(async () => {
 </script>
 
 <template>
+    <ma-loader :is-loading="isLoading"></ma-loader>
 <h2 class="title">Favorites</h2>
     <movies-list :movies="movies"></movies-list>
 </template>

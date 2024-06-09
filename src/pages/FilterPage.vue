@@ -8,6 +8,7 @@ import {useRoute} from "vue-router";
 const moviesOrigin = ref([])
 const {user} = useUser()
 const route = useRoute()
+const isLoading = ref(true)
 
 const totalPages = ref(1)
 
@@ -32,6 +33,7 @@ const filterMovies = async () => {
     moviesOrigin.value = response.data.results
 
     totalPages.value = response.data.total_pages
+    isLoading.value = false
 }
 
 const movies = computed(() => {
@@ -75,6 +77,7 @@ watch(() => route.query.endRating, () => {
 </script>
 
 <template>
+    <ma-loader :is-loading="isLoading"></ma-loader>
     <main class="filter-page">
         <section class="menu">
          <ma-dropdown></ma-dropdown>
